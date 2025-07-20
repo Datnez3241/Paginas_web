@@ -5,6 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Distribuidora de Dulces La Victoria</title>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -19,6 +21,10 @@
     <!-- Cargar Componentes -->
     <div id="header-container"></div>
     <div id="navbar-container"></div>
+    
+    <!-- Scripts de autenticación -->
+    <script src="frontend/assets/js/supabase-config.js"></script>
+    <script src="frontend/assets/js/auth.js"></script>
     
     <!-- Script para cargar componentes dinámicamente -->
     <script>
@@ -831,9 +837,136 @@
         </div>
     </div>
 </section>
-	</main>
+	    </main>
 
-	<footer class="footer">
+    <!-- Modal de Inicio de Sesión -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('loginModal').style.display='none'">&times;</span>
+            <h2>Iniciar Sesión</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Correo electrónico</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Contraseña</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+            </form>
+            <p class="text-center mt-3">
+                ¿No tienes una cuenta? <a href="#" onclick="showRegisterModal()">Regístrate aquí</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Modal de Registro -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('registerModal').style.display='none'">&times;</span>
+            <h2>Registrarse</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="registerName">Nombre completo</label>
+                    <input type="text" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Correo electrónico</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Contraseña (mínimo 6 caracteres)</label>
+                    <input type="password" id="registerPassword" minlength="6" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Registrarse</button>
+            </form>
+            <p class="text-center mt-3">
+                ¿Ya tienes una cuenta? <a href="#" onclick="showLoginModal()">Inicia sesión aquí</a>
+            </p>
+        </div>
+    </div>
+
+    <style>
+    /* Estilos para los modales */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 90%;
+        max-width: 400px;
+        border-radius: 8px;
+        position: relative;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover {
+        color: black;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .btn {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        width: 100%;
+    }
+
+    .btn-primary {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #45a049;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .mt-3 {
+        margin-top: 1rem;
+    }
+    </style>
+
+    <footer class="footer">
 		<div class="container container-footer">
 			<div class="menu-footer">
 				<div class="contact-info">
@@ -1126,7 +1259,122 @@ function cerrarSesion() {
 }
 
 // Llamar a la función cuando el DOM esté completamente cargado
-document.addEventListener('DOMContentLoaded', verificarSesion);
+document.addEventListener('DOMContentLoaded', function() {
+    verificarSesion();
+    setupAuthHandlers();
+    checkAuthState();
+});
+
+// Configurar manejadores de autenticación
+function setupAuthHandlers() {
+    // Manejador del formulario de registro
+    const registerForm = document.getElementById('registerForm');
+    if (registerForm) {
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            const { success, error } = await auth.signUp(email, password, name);
+            
+            if (success) {
+                alert('¡Registro exitoso! Por favor verifica tu correo electrónico.');
+                closeModal('registerModal');
+            } else {
+                alert('Error al registrarse: ' + error);
+            }
+        });
+    }
+    
+    // Manejador del formulario de inicio de sesión
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const { success, error } = await auth.signIn(email, password);
+            
+            if (success) {
+                alert('¡Inicio de sesión exitoso!');
+                closeModal('loginModal');
+                window.location.reload();
+            } else {
+                alert('Error al iniciar sesión: ' + error);
+            }
+        });
+    }
+    
+    // Manejador de cierre de sesión
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            const { success, error } = await auth.signOut();
+            if (success) {
+                window.location.href = '/';
+            }
+        });
+    }
+}
+
+// Verificar el estado de autenticación
+async function checkAuthState() {
+    const session = await auth.getCurrentSession();
+    updateAuthUI(session);
+    
+    // Escuchar cambios en el estado de autenticación
+    auth.onAuthStateChange((event, session) => {
+        updateAuthUI(session);
+    });
+}
+
+// Actualizar la interfaz de usuario según el estado de autenticación
+function updateAuthUI(session) {
+    const loginBtn = document.getElementById('loginBtn');
+    const registerBtn = document.getElementById('registerBtn');
+    const userMenu = document.getElementById('userMenu');
+    const userName = document.getElementById('userName');
+    
+    if (session) {
+        // Usuario autenticado
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (registerBtn) registerBtn.style.display = 'none';
+        if (userMenu) userMenu.style.display = 'block';
+        if (userName) {
+            const name = session.user.user_metadata?.full_name || session.user.email;
+            userName.textContent = name;
+        }
+    } else {
+        // Usuario no autenticado
+        if (loginBtn) loginBtn.style.display = 'block';
+        if (registerBtn) registerBtn.style.display = 'block';
+        if (userMenu) userMenu.style.display = 'none';
+    }
+}
+
+// Funciones auxiliares para mostrar/ocultar modales
+function showLoginModal() {
+    document.getElementById('loginModal').style.display = 'block';
+    document.getElementById('registerModal').style.display = 'none';
+}
+
+function showRegisterModal() {
+    document.getElementById('registerModal').style.display = 'block';
+    document.getElementById('loginModal').style.display = 'none';
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+// Hacer las funciones accesibles globalmente
+window.showLoginModal = showLoginModal;
+window.showRegisterModal = showRegisterModal;
+window.closeModal = closeModal;
 </script>
     </main>
 
