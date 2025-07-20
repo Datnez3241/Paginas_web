@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña - Dulcería La Victoria</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="estilo.css" />
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .recovery-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .recovery-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .recovery-logo img {
+            max-width: 150px;
+            margin-bottom: 15px;
+        }
+        .form-control, .form-control:focus {
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 16px;
+            height: 48px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #0a16c5;
+            box-shadow: 0 0 0 0.25rem rgba(10, 22, 197, 0.1);
+        }
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: block;
+            color: #333;
+        }
+        .btn-recovery {
+            background-color: #0a16c5;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-weight: 600;
+            font-size: 16px;
+            height: 48px;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+        .btn-recovery:hover {
+            background-color: #080f8a;
+        }
+        .back-to-login {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .back-to-login a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .back-to-login a:hover {
+            color: #0a16c5;
+        }
+        .mb-3 {
+            margin-bottom: 1.5rem !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="recovery-container">
+            <div class="recovery-logo">
+                <img src="imagen/mejora.png" alt="Logo Dulcería La Victoria">
+                <h2>Recuperar Contraseña</h2>
+                <p class="text-muted">Ingresa tu correo electrónico para restablecer tu contraseña</p>
+            </div>
+            
+            <form id="recoveryForm" action="procesar_recuperacion.php" method="POST">
+                <div class="mb-4">
+                    <label for="email" class="form-label">Correo Electrónico</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Ingresa tu correo electrónico" required>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-recovery">
+                        Enviar Enlace de Recuperación
+                    </button>
+                </div>
+            </form>
+            
+            <div class="back-to-login">
+                <a href="index.html" class="text-decoration-none">
+                    <i class="fas fa-arrow-left me-1"></i> Volver al Inicio de Sesión
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

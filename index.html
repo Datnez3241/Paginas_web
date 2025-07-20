@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distribuidora de Dulces La Victoria</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="frontend/assets/css/estilo.css">
+    <link rel="stylesheet" href="frontend/assets/css/gallery-5col.css">
+    <!-- Favicon -->
+    <link rel="icon" href="frontend/assets/img/imagen/mejora.png" type="image/png">
+
+<body class="index-page">
+    <!-- Cargar Componentes -->
+    <div id="header-container"></div>
+    <div id="navbar-container"></div>
+    
+    <!-- Script para cargar componentes dinámicamente -->
+    <script>
+    // Configuración de rutas base
+    window.BASE_PATH = (function() {
+        // Si estamos en Live Server (puerto 5500)
+        if (window.location.hostname === '127.0.0.1' && window.location.port === '5500') {
+            return ''; // Rutas relativas al root del proyecto
+        }
+        // Para cualquier otro caso (XAMPP, producción, etc.)
+        return ''; // Usar rutas relativas
+    })();
+    
+    // Configuración de la API
+    window.API_BASE_URL = (function() {
+        // Si estamos en Live Server (puerto 5500)
+        if (window.location.hostname === '127.0.0.1' && window.location.port === '5500') {
+            return 'http://localhost:8012/PROYECTO2/Backend';
+        }
+        // Para XAMPP (puerto 8012)
+        if (window.location.hostname === 'localhost' && window.location.port === '8012') {
+            return '/PROYECTO2/Backend';
+        }
+        // Para producción
+        return '/PROYECTO2/Backend';
+    })();
+    
+    // Función para navegar a una ruta
+    function navigateTo(path) {
+        // Asegurarse de que la ruta comience con /
+        const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+        window.location.href = `${window.BASE_PATH}${normalizedPath}`;
+    }
+    
+    // Función para inicializar los dropdowns
+    function initializeDropdowns() {
+        const dropdowns = document.querySelectorAll('.dropdown-toggle');
+        dropdowns.forEach(dropdown => {
+            // Asegurarse de que el botón tenga los atributos necesarios
+            dropdown.setAttribute('data-bs-toggle', 'dropdown');
+            dropdown.setAttribute('aria-expanded', 'false');
+            
+            // Inicializar el dropdown de Bootstrap
+            const dropdownInstance = new bootstrap.Dropdown(dropdown);
+            
+            // Añadir manejador de clic directo para asegurar el funcionamiento
+            dropdown.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropdownInstance.toggle();
+            });
+        });
+    }
+
+    // Función para cargar componentes
+    const loadComponent = (elementId, path) => {
+        return fetch(path)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById(elementId).innerHTML = html;
+                return html;
+            });
+    };
+
+    // Cargar header y navbar
+    document.addEventListener('DOMContentLoaded', function() {
+        // Cargar primero el header
+        loadComponent('header-container', 'frontend/views/components/header.html')
+            .then(() => {
+                // Inicializar dropdowns después de cargar el header
+                initializeDropdowns();
+                
+                // Luego cargar la navbar
+                return loadComponent('navbar-container', 'frontend/views/components/navbar.html');
+            })
+            .then(() => {
+                // Inicializar dropdowns después de cargar la navbar
+                initializeDropdowns();
+                
+                // Verificar nuevamente después de un breve retraso
+                setTimeout(initializeDropdowns, 200);
+            })
+            .catch(error => {
+                console.error('Error al cargar componentes:', error);
+            });
+    });
+    </script>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+
+	<a href="https://wa.me/573225769546?text=Bienvenido%20a%20la%20dulceria%20la%20victoria,%20en%20qu%C3%A9%20podemos%20servirte%20&send" class="whatsapp-float" target="_blank" title="¡Contáctanos por WhatsApp!">
+		<i class="fa-brands fa-whatsapp"></i> Escríbenos
+	</a>
+	
+
+
+	<section class="banner">
+		<div class="content-banner">
+			<p>LA FELICIDAD EN TODOS LOS SABORES, FORMAS Y TEXTURAS...</p>
+			<h2>DULCES PARA TI<br />Y TU NEGOCIO</h2>
+			<a href="#">Comprar ahora</a>
+		</div>
+	</section>
+
+	<main class="main-content">
+		<section class="container container-features">
+			<div class="card-feature">
+				<i class="fa-solid fa-plane-up"></i>
+				<div class="feature-content">
+					<span>Envío a nivel nacional</span>
+					<p>En pedidos superiores a $50.000 COP</p>
+				</div>
+			</div>
+			<div class="card-feature">
+				<i class="fa-solid fa-wallet"></i>
+				<div class="feature-content">
+					<span>Reembolso</span>
+					<p>100% garantía de devolución de dinero (apican T Y C)</p>
+				</div>
+			</div>
+			<div class="card-feature">
+				<i class="fa-solid fa-gift"></i>
+				<div class="feature-content">
+					<span>Bono especial de bienvenida</span>
+					<p>Bonos especiales con regalo</p>
+				</div>
+			</div>
+			<div class="card-feature">
+				<i class="fa-solid fa-headset"></i>
+				<div class="feature-content">
+					<span>Servicio al cliente</span>
+					<p>LLámenos (57)+601 + 7785671</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="container top-categories">
+			<h1 class="heading-1">Categorías</h1>
+			<div class="container-categories">
+				<div class="card-category category-moca">
+					<p>Dulcería</p>
+					<span>Ver más</span>
+				</div>
+				<div class="card-category category-expreso">
+					<p>Galletería</p>
+					<span>Ver más</span>
+				</div>
+				<div class="card-category category-capuchino">
+					<p>Chocolates</p>
+					<span>Ver más</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="container top-products">
+    <h1 class="heading-1">Mejores Productos</h1>
+    
+    <!-- Filtros de navegación -->
+    <div class="container-options mb-4">
+        <span class="active">Destacados</span>
+        <span>Nuevos Productos</span>
+        <span>Más Vendidos</span>
+    </div>
+
+    <!-- Galería de productos - Versión móvil -->
+    <div class="d-flex flex-row overflow-auto gap-3 py-2 d-md-none">
+        <!-- Producto 1 -->
+        <div class="card-product" style="min-width: 200px;">
+            <div class="position-relative">
+                <img src="frontend/assets/img/imagen/gomitas-trululu-fresitas-por-90gr.jpg" class="rounded" style="height: 150px; width: 100%; object-fit: cover;" alt="Gomitas trululu">
+                <span class="badge bg-danger position-absolute top-0 end-0 m-2">-13%</span>
+            </div>
+            <div class="p-2">
+                <div class="text-warning mb-1">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="far fa-star"></i>
+                </div>
+                <h6 class="mb-1">Gomitas Trululu X 90 gr</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">$2.350</span>
+                    <small class="text-muted text-decoration-line-through">$2.400</small>
+                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-shopping-basket"></i></button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Producto 2 -->
+        <div class="card-product" style="min-width: 200px;">
+            <div class="position-relative">
+                <img src="frontend/assets/img/imagen/galleta_oreo_12u_432gr_original_galletas_512x512.webp" class="rounded" style="height: 150px; width: 100%; object-fit: cover;" alt="Galletas Oreo">
+                <span class="badge bg-danger position-absolute top-0 end-0 m-2">-22%</span>
+            </div>
+            <div class="p-2">
+                <div class="text-warning mb-1">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="far fa-star"></i>
+                    <i class="far fa-star"></i>
+                </div>
+                <h6 class="mb-1">Galletas Oreo x 12 UND</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">$14.550</span>
+                    <small class="text-muted text-decoration-line-through">$14.620</small>
+                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-shopping-basket"></i></button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Producto 3 -->
+        <div class="card-product" style="min-width: 200px;">
+            <div class="position-relative">
+                <img src="frontend/assets/img/imagen/jumbo-grande-en-caja-.jpg" class="rounded" style="height: 150px; width: 100%; object-fit: cover;" alt="Jumbo caja grande">
+            </div>
+            <div class="p-2">
+                <div class="text-warning mb-1">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <h6 class="mb-1">Jumbo grande x 12 UND</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">$69.000</span>
+                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-shopping-basket"></i></button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Producto 4 -->
+        <div class="card-product" style="min-width: 200px;">
+            <div class="position-relative">
+                <img src="frontend/assets/img/imagen/bonbonbum.webp" class="rounded" style="height: 150px; width: 100%; object-fit: cover;" alt="BonBonBum">
+            </div>
+            <div class="p-2">
+                <div class="text-warning mb-1">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="far fa-star"></i>
+                </div>
+                <h6 class="mb-1">BonBonBum Rojo x 24 UND</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">$9.300</span>
+                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-shopping-basket"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Galería de productos - Versión escritorio -->
+    <div class="row g-4 d-none d-md-flex">
+        <!-- Producto 1 -->
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="position-relative">
+                    <img src="frontend/assets/img/imagen/gomitas-trululu-fresitas-por-90gr.jpg" class="card-img-top" alt="Gomitas trululu" style="height: 200px; object-fit: cover;">
+                    <span class="badge bg-danger position-absolute top-0 end-0 m-2">-13%</span>
+                </div>
+                <div class="card-body">
+                    <div class="text-warning mb-2">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <h5 class="card-title">Gomitas Trululu X 90 gr</h5>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div>
+                            <span class="h5 mb-0 fw-bold">$2.350</span>
+                            <small class="text-muted text-decoration-line-through d-block">$2.400</small>
+                        </div>
+                        <button class="btn btn-primary rounded-circle p-2">
+                            <i class="fas fa-shopping-basket"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Producto 2 -->
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="position-relative">
+                    <img src="frontend/assets/img/imagen/galleta_oreo_12u_432gr_original_galletas_512x512.webp" class="card-img-top" alt="Galletas Oreo" style="height: 200px; object-fit: cover;">
+                    <span class="badge bg-danger position-absolute top-0 end-0 m-2">-22%</span>
+                </div>
+                <div class="card-body">
+                    <div class="text-warning mb-2">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <h5 class="card-title">Galletas Oreo x 12 UND</h5>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div>
+                            <span class="h5 mb-0 fw-bold">$14.550</span>
+                            <small class="text-muted text-decoration-line-through d-block">$14.620</small>
+                        </div>
+                        <button class="btn btn-primary rounded-circle p-2">
+                            <i class="fas fa-shopping-basket"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Producto 3 -->
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="position-relative">
+                    <img src="frontend/assets/img/imagen/jumbo-grande-en-caja-.jpg" class="card-img-top" alt="Jumbo caja grande" style="height: 200px; object-fit: cover;">
+                </div>
+                <div class="card-body">
+                    <div class="text-warning mb-2">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h5 class="card-title">Jumbo grande x 12 UND</h5>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div>
+                            <span class="h5 mb-0 fw-bold">$69.000</span>
+                        </div>
+                        <button class="btn btn-primary rounded-circle p-2">
+                            <i class="fas fa-shopping-basket"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Producto 4 -->
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="position-relative">
+                    <img src="frontend/assets/img/imagen/bonbonbum.webp" class="card-img-top" alt="BonBonBum" style="height: 200px; object-fit: cover;">
+                </div>
+                <div class="card-body">
+                    <div class="text-warning mb-2">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <h5 class="card-title">BonBonBum Rojo x 24 UND</h5>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div>
+                            <span class="h5 mb-0 fw-bold">$9.300</span>
+                        </div>
+                        <button class="btn btn-primary rounded-circle p-2">
+                            <i class="fas fa-shopping-basket"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+		<div class="gallery-wrapper">
+			<!-- Galería horizontal solo en móvil -->
+			<div class="d-flex flex-row overflow-auto gap-2 py-2 d-md-none">
+								<img src="frontend/assets/img/imagen/galeria imagen 1.jpg" alt="Galeria Img1" class="rounded"
+					style="height: 130px; min-width: 130px; object-fit: cover;">
+					<img src="frontend/assets/img/imagen/galeria imagen 2.jpeg" alt="Galeria Img2" class="rounded"
+						style="height: 130px; min-width: 130px; object-fit: cover;">
+					<img src="frontend/assets/img/imagen/galeria imagen 3.jpg" alt="Galeria Img3" class="rounded"
+						style="height: 130px; min-width: 130px; object-fit: cover;">
+{{ ... }}
+					<img src="frontend/assets/img/imagen/galeria imagen 4.jfif" alt="Galeria Img4" class="rounded"
+						style="height: 130px; min-width: 130px; object-fit: cover;">
+					<img src="frontend/assets/img/imagen/galeria imagen 5.avif" alt="Galeria Img5" class="rounded"
+						style="height: 130px; min-width: 130px; object-fit: cover;">
+			</div>
+			<!-- Galería grid 5 columnas solo en escritorio -->
+			<div class="gallery-5col d-none d-md-flex">
+				<div><img src="frontend/assets/img/imagen/galeria imagen 1.jpg" alt="Galeria Img1"></div>
+				<div><img src="frontend/assets/img/imagen/galeria imagen 2.jpeg" alt="Galeria Img2"></div>
+				<div><img src="frontend/assets/img/imagen/galeria imagen 3.jpg" alt="Galeria Img3"></div>
+				<div><img src="frontend/assets/img/imagen/galeria imagen 4.jfif" alt="Galeria Img4"></div>
+				<div><img src="frontend/assets/img/imagen/galeria imagen 5.avif" alt="Galeria Img5"></div>
+			</div>
+		</div>
+
+		<section class="container specials my-5">
+    <h1 class="heading-1 mb-4">Productos Especiales</h1>
+    
+    <!-- Galería de productos especiales - Versión móvil -->
+    <div class="d-flex flex-row overflow-auto gap-3 py-2 d-md-none">
+        <!-- Producto 1 -->
+        <div class="card-product" style="min-width: 200px;">
+            <div class="position-relative">
+                <img src="frontend/assets/img/imagen/menta helada.jpg" class="rounded" style="height: 150px; width: 100%; object-fit: cover;" alt="Menta Helada">
+                <span class="badge bg-danger position-absolute top-0 end-0 m-2">-13%</span>
+            </div>
+            <div class="p-2">
+                <div class="text-warning mb-1">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="far fa-star"></i>
+                </div>
+                <h6 class="mb-1">Menta Helada Limonada</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">$7.700</span>
+                    <small class="text-muted text-decoration-line-through">$7.830</small>
+                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-shopping-basket"></i></button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Producto 2 -->
+        <div class="card-product" style="min-width: 200px;">
+            <div class="position-relative">
+                <img src="frontend/assets/img/imagen/galleta maxcoco.jpg" class="rounded" style="height: 150px; width: 100%; object-fit: cover;" alt="Galleta Maxcoco">
+                <span class="badge bg-danger position-absolute top-0 end-0 m-2">-22%</span>
+            </div>
+            <div class="p-2">
+                <div class="text-warning mb-1">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="far fa-star"></i>
+                    <i class="far fa-star"></i>
+                </div>
+                <h6 class="mb-1">Marshmallows</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">$5.900</span>
+                    <small class="text-muted text-decoration-line-through">$6.050</small>
+                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-shopping-basket"></i></button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Producto 3 -->
+        <div class="card-product" style="min-width: 200px;">
+            <div class="position-relative">
+                <img src="frontend/assets/img/imagen/chupeta-bon-bon-bum-surtido-tropical-x-24-und-456-g-1.webp" class="rounded" style="height: 150px; width: 100%; object-fit: cover;" alt="Chupeta Bon Bon Bum">
+                <span class="badge bg-danger position-absolute top-0 end-0 m-2">-30%</span>
+            </div>
+            <div class="p-2">
+                <div class="text-warning mb-1">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <h6 class="mb-1">Gomitas Trululu Aros</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">$2.350</span>
+                    <small class="text-muted text-decoration-line-through">$2.720</small>
+                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-shopping-basket"></i></button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Producto 4 -->
+        <div class="card-product" style="min-width: 200px;">
+            <div class="position-relative">
+                <img src="frontend/assets/img/imagen/gomas bubbaloo x caja.webp" class="rounded" style="height: 150px; width: 100%; object-fit: cover;" alt="Gomas Bubbaloo">
+            </div>
+            <div class="p-2">
+                <div class="text-warning mb-1">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="far fa-star"></i>
+                </div>
+                <h6 class="mb-1">Gomas Bubbaloo fresa</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">$11.500</span>
+                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-shopping-basket"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Galería de productos especiales - Versión escritorio -->
+    <div class="row g-4 d-none d-md-flex">
+        <!-- Producto 1 -->
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="position-relative">
+                    <img src="frontend/assets/img/imagen/menta helada.jpg" class="card-img-top" alt="Menta Helada" style="height: 200px; object-fit: cover;">
+                    <span class="badge bg-danger position-absolute top-0 end-0 m-2">-13%</span>
+                </div>
+                <div class="card-body">
+                    <div class="text-warning mb-2">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <h5 class="card-title">Menta Helada Limonada</h5>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div>
+                            <span class="h5 mb-0 fw-bold">$7.700</span>
+                            <small class="text-muted text-decoration-line-through d-block">$7.830</small>
+                        </div>
+                        <button class="btn btn-primary rounded-circle p-2">
+                            <i class="fas fa-shopping-basket"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Producto 2 -->
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="position-relative">
+                    <img src="frontend/assets/img/imagen/galleta maxcoco.jpg" class="card-img-top" alt="Galleta Maxcoco" style="height: 200px; object-fit: cover;">
+                    <span class="badge bg-danger position-absolute top-0 end-0 m-2">-22%</span>
+                </div>
+                <div class="card-body">
+                    <div class="text-warning mb-2">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <h5 class="card-title">Marshmallows</h5>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div>
+                            <span class="h5 mb-0 fw-bold">$5.900</span>
+                            <small class="text-muted text-decoration-line-through d-block">$6.050</small>
+                        </div>
+                        <button class="btn btn-primary rounded-circle p-2">
+                            <i class="fas fa-shopping-basket"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Producto 3 -->
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="position-relative">
+                    <img src="frontend/assets/img/imagen/chupeta-bon-bon-bum-surtido-tropical-x-24-und-456-g-1.webp" class="card-img-top" alt="Chupeta Bon Bon Bum" style="height: 200px; object-fit: cover;">
+                    <span class="badge bg-danger position-absolute top-0 end-0 m-2">-30%</span>
+                </div>
+                <div class="card-body">
+                    <div class="text-warning mb-2">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h5 class="card-title">Gomitas Trululu Aros</h5>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div>
+                            <span class="h5 mb-0 fw-bold">$2.350</span>
+                            <small class="text-muted text-decoration-line-through d-block">$2.720</small>
+                        </div>
+                        <button class="btn btn-primary rounded-circle p-2">
+                            <i class="fas fa-shopping-basket"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Producto 4 -->
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="position-relative">
+                    <img src="frontend/assets/img/imagen/gomas bubbaloo x caja.webp" class="card-img-top" alt="Gomas Bubbaloo" style="height: 200px; object-fit: cover;">
+                </div>
+                <div class="card-body">
+                    <div class="text-warning mb-2">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <h5 class="card-title">Gomas Bubbaloo fresa</h5>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div>
+                            <span class="h5 mb-0 fw-bold">$11.500</span>
+                        </div>
+                        <button class="btn btn-primary rounded-circle p-2">
+                            <i class="fas fa-shopping-basket"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+		<style>
+/* Blog section styles */
+.blogs {
+    padding: 60px 0;
+}
+
+.container-blogs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.card-blog {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.card-blog:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.container-img {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    padding-top: 66.67%; /* 4:3 Aspect Ratio */
+}
+
+.container-img img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.card-blog:hover .container-img img {
+    transform: scale(1.05);
+}
+
+.button-group-blog {
+    position: absolute;
+    top: 0;
+    left: -50px;
+    width: 50px;
+    display: flex;
+    flex-direction: column;
+    background: rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+    opacity: 0;
+}
+
+.card-blog:hover .button-group-blog {
+    left: 0;
+    opacity: 1;
+}
+
+.button-group-blog span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 50px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.button-group-blog span:hover {
+    background: var(--primary-color);
+}
+
+.content-blog {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.content-blog h3 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.content-blog span {
+    color: #777;
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.content-blog p {
+    font-size: 1.5rem;
+    color: #555;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    flex-grow: 1;
+}
+
+.btn-read-more {
+    display: inline-block;
+    padding: 10px 20px;
+    background: var(--primary-color);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1.4rem;
+    transition: all 0.3s ease;
+    text-align: center;
+    align-self: flex-start;
+}
+
+.btn-read-more:hover {
+    background: #0a16c5;
+    transform: translateY(-2px);
+}
+</style>
+
+<section class="container blogs">
+    <h1 class="heading-1">Consultas</h1>
+
+    <div class="container-blogs">
+        <div class="card-blog">
+            <div class="container-img">
+                <img src="frontend/assets/img/imagen/preguntas frecuentes.jpg" alt="Imagen consultas signo interrogación" />
+                <div class="button-group-blog">
+                    <span>
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <span>
+                        <i class="fa-solid fa-link"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="content-blog">
+                <h3>Preguntas Frecuentes</h3>
+                <span>29 mayo 2024</span>
+                <p>
+                    Aquí puedes escribir tus preguntas...
+                    Con gusto las solucionaremos.
+                </p>
+                <div class="btn-read-more">Leer más</div>
+            </div>
+        </div>
+        <div class="card-blog">
+            <div class="container-img">
+                <img src="frontend/assets/img/imagen/x Nequi-Daviplata-1.png" alt="Imagen nequi y davipalta Blog 2" />
+                <div class="button-group-blog">
+                    <span>
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <span>
+                        <i class="fa-solid fa-link"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="content-blog">
+                <h3>Métodos De Pago</h3>
+                <span>29 mayo 2024</span>
+                <p>
+                    Aquí puedes consultar nuestros métodos de pago...
+                    Escoge el tuyo.
+                </p>
+                <div class="btn-read-more">Leer más</div>
+            </div>
+        </div>
+        <div class="card-blog">
+            <div class="container-img">
+                <img src="frontend/assets/img/imagen/Mensajero-domiciliario1.png" alt="Imagen mensajero Blog 3" />
+                <div class="button-group-blog">
+                    <span>
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <span>
+                        <i class="fa-solid fa-link"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="content-blog">
+                <h3>Domicilios</h3>
+                <span>29 Mayo 2024</span>
+                <p>
+                    Aquí puedes consultar nuestro servicio de domicilio para tu ciudad...
+                    Con gusto lo despacharémos.
+                </p>
+                <div class="btn-read-more">Leer más</div>
+            </div>
+        </div>
+    </div>
+</section>
+	</main>
+
+	<footer class="footer">
+		<div class="container container-footer">
+			<div class="menu-footer">
+				<div class="contact-info">
+					<p class="title-footer">Información de Contacto</p>
+					<ul>
+						<li>
+							Dirección: calle 105 b # 67-39
+						</li>
+						<li>Teléfono: (601)-778-56-71</li>
+						<li>Fax: 778-56-71 opción (1)</li>
+						<li>EmaiL: distribuidoradedulceslavictoria@gmail.com</li>
+					</ul>
+					<div class="social-icons">
+						<span class="facebook">
+							<i class="fa-brands fa-facebook-f"></i>
+						</span>
+						<span class="twitter">
+							<i class="fa-brands fa-twitter"></i>
+						</span>
+						<span class="youtube">
+							<i class="fa-brands fa-youtube"></i>
+						</span>
+						<span class="pinterest">
+							<i class="fa-brands fa-pinterest-p"></i>
+						</span>
+						<span class="instagram">
+							<i class="fa-brands fa-instagram"></i>
+						</span>
+					</div>
+				</div>
+
+				<div class="information">
+					<p class="title-footer">Información</p>
+					<ul>
+						<li><a href="#">Acerca de Nosotros</a></li>
+						<li><a href="#">Información Domicilios</a></li>
+						<li><a href="#">Politicas de Privacidad</a></li>
+						<li><a href="#">Términos y condiciones</a></li>
+						<li><a href="#">Contactános</a></li>
+					</ul>
+				</div>
+
+				<div class="my-account">
+					<p class="title-footer">Mi cuenta</p>
+
+					<ul>
+						<li><a href="#">Mi cuenta</a></li>
+						<li><a href="#">Historial de ordenes</a></li>
+						<li><a href="#">Lista de deseos</a></li>
+						<li><a href="#">Boletín</a></li>
+						<li><a href="#">Reembolsos</a></li>
+					</ul>
+				</div>
+
+				<div class="newsletter">
+					<p class="title-footer">Boletín informativo</p>
+
+					<div class="content">
+						<p>
+							Suscríbete a nuestros boletines ahora y mantente al
+							día con nuevas colecciones y ofertas exclusivas.
+						</p>
+						<input type="email" placeholder="Ingresa el correo aquí...">
+						<button>Suscríbete</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="copyright">
+				<p>
+					Desarrollado por: DISEÑO WEB DR &copy; 2024
+				</p>
+
+				<img src="frontend/img/imagen/chat en linea.jpg" alt="Pagos">
+			</div>
+		</div>
+	</footer>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+		crossorigin="anonymous"></script>
+
+	<script src="https://kit.fontawesome.com/81581fb069.js" crossorigin="anonymous"></script>
+    <script src="js/config.js"></script>
+    <script src="js/script.js"></script>
+	<script>
+		const menuToggle = document.querySelector('.menu-toggle');
+		const mainMenu = document.getElementById('mainMenu');
+		menuToggle.addEventListener('click', () => {
+			mainMenu.classList.toggle('open');
+		});
+		document.addEventListener('click', (e) => {
+			if (!menuToggle.contains(e.target) && !mainMenu.contains(e.target)) {
+				mainMenu.classList.remove('open');
+			}
+		});
+	</script>
+	<script>
+
+
+		const btn = document.querySelector('.mobile-menu-btn');
+		if (window.innerWidth <= 480) {
+			btn.style.display = 'block';
+		} else {
+			btn.style.display = 'none';
+		}
+
+
+		const menuBtn = document.querySelector('.mobile-menu-btn');
+		const mobileMenu = document.querySelector('.mobile-menu');
+		const mobileOverlay = document.querySelector('.mobile-menu-overlay');
+		const closeBtn = document.querySelector('.mobile-menu-close');
+
+		function openMobileMenu() {
+			mobileMenu.classList.add('open');
+			mobileMenu.style.display = 'flex';
+			mobileOverlay.style.display = 'block';
+		}
+		function closeMobileMenu() {
+			mobileMenu.classList.remove('open');
+			mobileMenu.style.display = 'none';
+			mobileOverlay.style.display = 'none';
+		}
+		if (menuBtn && mobileMenu && mobileOverlay && closeBtn) {
+			menuBtn.addEventListener('click', openMobileMenu);
+			closeBtn.addEventListener('click', closeMobileMenu);
+			mobileOverlay.addEventListener('click', closeMobileMenu);
+		}
+	</script>
+	
+	<!-- Scripts de la aplicación -->
+	<script src="js/config.js"></script>
+	<script src="js/script.js"></script>
+<!-- Modal de Perfil de Usuario -->
+<div id="profileModal" class="modal" style="display:none;">
+  <div class="modal-content" style="max-width: 400px; margin: 50px auto; padding: 30px; background: white; border-radius: 10px; position: relative;">
+    <span class="close" id="closeProfileModal" style="position: absolute; top: 15px; right: 20px; font-size: 28px; cursor: pointer;">&times;</span>
+    <h2 style="text-align:center; margin-bottom: 20px;">Mi Perfil</h2>
+    <form id="profileForm">
+      <div class="form-group" style="margin-bottom: 15px;">
+        <label>Nombre completo</label>
+        <input type="text" name="nombre_completo" id="profileNombre" class="form-control" style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;">
+      </div>
+      <div class="form-group" style="margin-bottom: 15px;">
+        <label>Correo electrónico</label>
+        <input type="email" name="correo" id="profileCorreo" class="form-control" style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;">
+      </div>
+      <div class="form-group" style="margin-bottom: 15px;">
+        <label>Nueva contraseña</label>
+        <input type="password" name="contrasena" id="profileContrasena" class="form-control" style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;">
+      </div>
+      <div id="profileMessage" style="margin-bottom: 12px; color: #d32f2f; text-align: center;"></div>
+      <button type="submit" class="btn-submit" style="width:100%;background-color:#0a16c5;color:white;border:none;border-radius:8px;padding:12px 20px;font-size:16px;font-weight:600;">Guardar Cambios</button>
+    </form>
+  </div>
+</div>
+<script>
+// Cerrar modal de perfil
+const closeProfileModal = document.getElementById('closeProfileModal');
+const profileModal = document.getElementById('profileModal');
+if (closeProfileModal && profileModal) {
+  closeProfileModal.onclick = function() {
+    profileModal.style.display = 'none';
+  };
+  window.addEventListener('click', function(e) {
+    if (e.target === profileModal) {
+      profileModal.style.display = 'none';
+    }
+  });
+}
+
+// Verificar el estado de la sesión al cargar la página
+function verificarSesion() {
+  fetch('backend/check_session.php')
+    .then(response => response.json())
+    .then(data => {
+      const userDropdownMenu = document.getElementById('userDropdownMenu');
+      const userNameElement = document.getElementById('userName');
+      const userIcon = document.querySelector('#userDropdown i');
+      
+      if (data.loggedIn) {
+        // Usuario autenticado
+        const nombreMostrar = data.usuario.nombre || 'Mi cuenta';
+        
+        if (userNameElement) {
+          // Mostrar solo el primer nombre si es muy largo
+          const nombreCorto = nombreMostrar.length > 15 ? 
+            nombreMostrar.split(' ')[0] : nombreMostrar;
+          userNameElement.textContent = nombreCorto;
+          
+          // Agregar tooltip con el nombre completo si se recorta
+          if (nombreMostrar !== nombreCorto) {
+            userNameElement.setAttribute('title', nombreMostrar);
+            userNameElement.style.cursor = 'help';
+          }
+        }
+        
+        // Actualizar el menú desplegable
+        if (userDropdownMenu) {
+          userDropdownMenu.innerHTML = `
+            <li class="px-3 py-2 text-muted small border-bottom">
+              <div class="fw-bold">${nombreMostrar}</div>
+              <div class="text-truncate" style="max-width: 180px;">${data.usuario.correo || ''}</div>
+            </li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center py-2" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">
+                <i class="fas fa-user me-2" style="width: 20px; text-align: center; color: #6c757d;"></i>
+                <span>Mi perfil</span>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider my-1"></li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center py-2 text-danger" href="#" id="logoutBtn">
+                <i class="fas fa-sign-out-alt me-2" style="width: 20px; text-align: center;"></i>
+                <span>Cerrar sesión</span>
+              </a>
+            </li>
+          `;
+          
+          // Agregar manejador de evento para cerrar sesión
+          document.getElementById('logoutBtn')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+              cerrarSesion();
+            }
+          });
+        }
+        
+        // Cambiar el ícono a un usuario autenticado
+        if (userIcon) {
+          userIcon.className = 'fa-solid fa-circle-user fs-4';
+        }
+      } else {
+        // Usuario no autenticado
+        if (userNameElement) {
+          userNameElement.textContent = 'Cuenta';
+        }
+        
+        // Restaurar el menú por defecto
+        if (userDropdownMenu) {
+          userDropdownMenu.innerHTML = `
+            <li class="px-3 py-2 text-muted small border-bottom">
+              <div class="fw-bold">Bienvenido</div>
+              <div>Inicia sesión para continuar</div>
+            </li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center py-2" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">
+                <i class="fas fa-sign-in-alt me-2" style="width: 20px; text-align: center; color: #6c757d;"></i>
+                <span>Iniciar sesión</span>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center py-2" href="#" data-bs-toggle="modal" data-bs-target="#registerModal">
+                <i class="fas fa-user-plus me-2" style="width: 20px; text-align: center; color: #6c757d;"></i>
+                <span>Crear cuenta</span>
+              </a>
+            </li>
+          `;
+        }
+        
+        // Cambiar el ícono a un usuario no autenticado
+        if (userIcon) {
+          userIcon.className = 'fa-regular fa-circle-user fs-4';
+        }
+      }
+    })
+    .catch(error => {
+      console.error('Error al verificar la sesión:', error);
+    });
+}
+
+// Función para cerrar sesión
+function cerrarSesion() {
+  fetch('backend/logout.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Recargar la página para actualizar la interfaz
+      window.location.reload();
+    }
+  })
+  .catch(error => {
+    console.error('Error al cerrar sesión:', error);
+  });
+}
+
+// Llamar a la función cuando el DOM esté completamente cargado
+document.addEventListener('DOMContentLoaded', verificarSesion);
+</script>
+    </main>
+
+    <!-- Cargar Footer -->
+    <div id="footer-container"></div>
+
+    <!-- jQuery, Popper.js, Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Scripts personalizados -->
+    <script src="frontend/assets/js/script.js"></script>
+    
+    <!-- Incluir modales -->
+    <div id="modals-container"></div>
+    
+    <script>
+        // Cargar modales
+        fetch('frontend/views/components/modals.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('modals-container').innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error al cargar los modales:', error);
+            });
+    </script>
+</body>
+
+</html>

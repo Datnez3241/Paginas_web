@@ -1,0 +1,70 @@
+<!-- Header -->
+<header class="w-100" style="background: var(--background-color); color: #151515; padding: 0.7rem 0;">
+    <div class="container-fluid">
+        <div class="row align-items-center g-0">
+            <!-- Soporte al cliente -->
+            <div class="col-2 d-flex align-items-center justify-content-center">
+                <i class="fa-solid fa-headset me-1"></i>
+                <div class="d-flex flex-column ms-1">
+                    <span style="font-size:1.85rem;">Soporte</span>
+                    <span style="font-size:1.25rem;font-weight:bold;">3225769546</span>
+                </div>
+            </div>
+            
+            <!-- Logo -->
+            <div class="col-2 d-flex align-items-center justify-content-end">
+                <a href="../../index.html">
+                    <img src="../../../frontend/assets/img/imagen/mejora.png" alt="Logo" style="height: 50px;" class="me-2">
+                </a>
+            </div>
+            
+            <!-- Nombre de la empresa -->
+            <div class="col-4 d-flex align-items-center justify-content-start">
+                <h1 class="display-8 fw-bold text-uppercase nombre-header" style="margin-bottom:0;color:#0a16c5">
+                    Distribuidora de Dulces La Victoria
+                </h1>
+            </div>
+            
+            <!-- Menú de usuario y carrito -->
+            <div class="col-4 d-flex align-items-center justify-content-end gap-4">
+                <!-- Carrito de compras -->
+                <div class="position-relative">
+                    <a href="#" class="btn btn-outline-secondary d-flex align-items-center gap-2 cart-icon">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="d-none d-md-inline">Carrito</span>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                              style="font-size: 0.6rem; padding: 0.25em 0.5em;">0</span>
+                    </a>
+                </div>
+
+                <!-- Menú de usuario -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2" 
+                            type="button" id="userDropdown" data-bs-toggle="dropdown" 
+                            aria-expanded="false" 
+                            style="border: 1px solid #ddd; border-radius: 20px; padding: 6px 12px; background: white;">
+                        <i class="fa-regular fa-circle-user fs-5"></i>
+                        <span class="d-none d-md-inline" id="userName">Cuenta</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" 
+                        aria-labelledby="userDropdown" 
+                        id="userDropdownMenu"
+                        style="border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; min-width: 200px;">
+                        <!-- Contenido dinámico según estado de autenticación -->
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center py-2" href="javascript:void(0);" onclick="navigateTo('/frontend/views/login.html')">
+                                <i class="fas fa-sign-in-alt me-2" style="width: 20px; text-align: center;"></i>
+                                <span>Iniciar sesión</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center py-2" href="javascript:void(0);" onclick="navigateTo('/frontend/views/registro.html')">
+                                <i class="fas fa-user-plus me-2" style="width: 20px; text-align: center;"></i>
+                                <span>Crear cuenta</span>
+                            </a>
+                        </li>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
