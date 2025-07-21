@@ -45,26 +45,168 @@
                             style="border: 1px solid #ddd; border-radius: 20px; padding: 6px 12px; background: white;">
                         <i class="fa-regular fa-circle-user fs-5"></i>
                         <span class="d-none d-md-inline" id="userName">Cuenta</span>
+                        <span class="d-none" id="userDisplayName"></span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow-sm" 
                         aria-labelledby="userDropdown" 
                         id="userDropdownMenu"
-                        style="border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; min-width: 200px;">
-                        <!-- Contenido dinámico según estado de autenticación -->
-                        <li>
+                        style="border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; min-width: 220px;">
+                        
+                        <!-- Encabezado del menú cuando el usuario está autenticado -->
+                        <li id="userInfoHeader" class="dropdown-header d-none">
+                            <div class="d-flex flex-column px-3 py-2">
+                                <span class="fw-bold" id="menuUserName">Usuario</span>
+                                <small class="text-muted" id="menuUserEmail">usuario@ejemplo.com</small>
+                            </div>
+                        </li>
+                        <li id="userMenuDivider" class="dropdown-divider d-none"></li>
+                        
+                        <!-- Opciones para usuarios no autenticados -->
+                        <li id="loginMenuItem">
                             <a class="dropdown-item d-flex align-items-center py-2" href="javascript:void(0);" onclick="navigateTo('/frontend/views/login.html')">
                                 <i class="fas fa-sign-in-alt me-2" style="width: 20px; text-align: center;"></i>
                                 <span>Iniciar sesión</span>
                             </a>
                         </li>
-                        <li>
+                        <li id="registerMenuItem">
                             <a class="dropdown-item d-flex align-items-center py-2" href="javascript:void(0);" onclick="navigateTo('/frontend/views/registro.html')">
                                 <i class="fas fa-user-plus me-2" style="width: 20px; text-align: center;"></i>
                                 <span>Crear cuenta</span>
                             </a>
                         </li>
+                        
+                        <!-- Opciones para usuarios autenticados -->
+                        <li id="profileMenuItem" class="d-none">
+                            <a class="dropdown-item d-flex align-items-center py-2" href="javascript:void(0);" onclick="navigateTo('/frontend/views/perfil.html')">
+                                <i class="fas fa-user me-2" style="width: 20px; text-align: center;"></i>
+                                <span>Mi perfil</span>
+                            </a>
+                        </li>
+                        <li id="ordersMenuItem" class="d-none">
+                            <a class="dropdown-item d-flex align-items-center py-2" href="javascript:void(0);" onclick="navigateTo('/frontend/views/mis-pedidos.html')">
+                                <i class="fas fa-shopping-bag me-2" style="width: 20px; text-align: center;"></i>
+                                <span>Mis pedidos</span>
+                            </a>
+                        </li>
+                        
+                        <!-- Opciones de administrador -->
+                        <li id="adminMenuItem" class="d-none">
+                            <a class="dropdown-item d-flex align-items-center py-2" href="javascript:void(0);" onclick="navigateTo('/admin')">
+                                <i class="fas fa-cog me-2" style="width: 20px; text-align: center;"></i>
+                                <span>Panel de administración</span>
+                            </a>
+                        </li>
+                        
+                        <!-- Separador antes de cerrar sesión -->
+                        <li id="logoutDivider" class="dropdown-divider d-none"></li>
+                        
+                        <!-- Cerrar sesión -->
+                        <li id="logoutMenuItem" class="d-none">
+                            <a class="dropdown-item d-flex align-items-center py-2 text-danger" href="javascript:void(0);" onclick="cerrarSesion()">
+                                <i class="fas fa-sign-out-alt me-2" style="width: 20px; text-align: center;"></i>
+                                <span>Cerrar sesión</span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
 </header>
+
+<script>
+// Este script se ejecutará cuando el documento esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    updateAuthUI();
+    
+    // Suscribirse a cambios de autenticación
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        updateAuthUI(session);
+    });
+    
+    // Limpiar la suscripción cuando el componente se desmonte
+    return () => subscription?.unsubscribe();
+});
+
+// Función para actualizar la interfaz según el estado de autenticación
+async function updateAuthUI(session = null) {
+    try {
+        // Obtener la sesión actual si no se proporciona
+        if (!session) {
+            const { data: { session: currentSession } } = await supabase.auth.getSession();
+            session = currentSession;
+        }
+        
+        if (session) {
+            // Obtener datos del perfil del usuario
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+            
+            // Mostrar nombre de usuario en el botón
+            const userNameElement = document.getElementById('userName');
+            const userDisplayName = document.getElementById('userDisplayName');
+            const displayName = (profile?.nombre || session.user.user_metadata?.full_name || 'Mi cuenta');
+            
+            userNameElement.textContent = displayName;
+            userDisplayName.textContent = displayName;
+            userDisplayName.classList.remove('d-none');
+            
+            // Actualizar encabezado del menú desplegable
+            document.getElementById('userInfoHeader').classList.remove('d-none');
+            document.getElementById('userMenuDivider').classList.remove('d-none');
+            document.getElementById('menuUserName').textContent = displayName;
+            document.getElementById('menuUserEmail').textContent = session.user.email;
+            
+            // Mostrar/ocultar elementos del menú
+            document.getElementById('loginMenuItem').classList.add('d-none');
+            document.getElementById('registerMenuItem').classList.add('d-none');
+            document.getElementById('profileMenuItem').classList.remove('d-none');
+            document.getElementById('ordersMenuItem').classList.remove('d-none');
+            document.getElementById('logoutDivider').classList.remove('d-none');
+            document.getElementById('logoutMenuItem').classList.remove('d-none');
+            
+            // Verificar si es administrador
+            if (profile && profile.rol === 'admin') {
+                document.getElementById('adminMenuItem').classList.remove('d-none');
+            } else {
+                document.getElementById('adminMenuItem').classList.add('d-none');
+            }
+        } else {
+            // Usuario no autenticado
+            document.getElementById('userName').textContent = 'Cuenta';
+            document.getElementById('userDisplayName').classList.add('d-none');
+            document.getElementById('userInfoHeader').classList.add('d-none');
+            document.getElementById('userMenuDivider').classList.add('d-none');
+            document.getElementById('loginMenuItem').classList.remove('d-none');
+            document.getElementById('registerMenuItem').classList.remove('d-none');
+            document.getElementById('profileMenuItem').classList.add('d-none');
+            document.getElementById('ordersMenuItem').classList.add('d-none');
+            document.getElementById('adminMenuItem').classList.add('d-none');
+            document.getElementById('logoutDivider').classList.add('d-none');
+            document.getElementById('logoutMenuItem').classList.add('d-none');
+        }
+    } catch (error) {
+        console.error('Error al actualizar la interfaz de usuario:', error);
+    }
+}
+
+// Función para cerrar sesión
+async function cerrarSesion() {
+    try {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+        
+        // Redirigir a la página de inicio
+        window.location.href = '/';
+    } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+        alert('Ocurrió un error al cerrar la sesión. Por favor, inténtalo de nuevo.');
+    }
+}
+
+// Hacer la función accesible globalmente
+window.cerrarSesion = cerrarSesion;
+</script>

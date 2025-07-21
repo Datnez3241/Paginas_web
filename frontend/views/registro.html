@@ -45,7 +45,11 @@
             font-size: 0.85rem;
         }
     </style>
-    <script src="../assets/js/config.js"></script>
+   
+    <!-- Incluir Supabase JS -->
+     
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase-config.js"></script>
 </head>
 <body class="index-page">
     <!-- Cargar Componentes -->
@@ -130,6 +134,12 @@
     <script>
     // Configuración de rutas base
     window.basePath = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : '/PROYECTO2';
+    
+    // Función para validar formato de correo electrónico
+    function validarEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(String(email).toLowerCase());
+    }
     
     // Función para navegar a una ruta (disponible globalmente)
     window.navigateTo = function(path) {
@@ -222,6 +232,14 @@
         console.log('=== INICIO DE VALIDACIÓN ===');
         console.log('Formulario:', form);
         
+        // Validar formato de correo electrónico
+        const email = document.getElementById('correo').value.trim();
+        if (!validarEmail(email)) {
+            showAlert('Por favor ingresa un correo electrónico válido.', 'warning');
+            document.getElementById('correo').focus();
+            return;
+        }
+
         // Validar todos los campos requeridos
         const requiredFields = form.querySelectorAll('[required]');
         let isValid = true;
@@ -288,24 +306,56 @@
             
             console.log('Enviando datos:', userData);
             
-            const response = await fetch(`${window.API_BASE_URL}/registro.php`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(userData)
+            // Intentar registrar directamente con Supabase Auth
+            // La verificación de correo existente se manejará automáticamente
+            // Primero, registrar el usuario en Auth
+            const { data, error } = await supabase.auth.signUp({
+                email: userData.correo.trim().toLowerCase(),
+                password: userData.contrasena,
+                options: {
+                    data: {
+                        full_name: userData.nombre_completo.trim(),
+                        email: userData.correo.trim().toLowerCase()
+                    },
+                    emailRedirectTo: window.location.origin + '/login.html'
+                }
             });
             
-            const result = await response.json();
+            if (error) {
+                console.error('Error en registro Supabase:', error);
+                let errorMessage = 'Error en el registro. ';
+                
+                // Manejar diferentes tipos de errores de Supabase
+                if (error.message.includes('already registered') || error.message.includes('already in use')) {
+                    errorMessage = 'Este correo electrónico ya está registrado. Por favor, inicia sesión o utiliza otro correo.';
+                } else if (error.message.includes('valid email') || error.message.includes('must be a valid')) {
+                    errorMessage = 'Por favor ingresa un correo electrónico válido.';
+                } else if (error.message.includes('password')) {
+                    errorMessage = 'La contraseña debe tener al menos 6 caracteres.';
+                } else if (error.message.includes('email')) {
+                    errorMessage = 'El formato del correo electrónico no es válido.';
+                } else {
+                    errorMessage += error.message;
+                }
+                
+                showAlert(errorMessage, 'danger');
+                return;
+            }
             
-            if (result.success) {
+            // Si el registro fue exitoso pero requiere verificación de correo
+            if (data.user && !data.user.identities) {
+                showAlert('¡Registro exitoso! Por favor verifica tu correo electrónico para activar tu cuenta.', 'success');
+                // Redirigir al login después de 3 segundos
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 3000);
+            } else if (data.user) {
+                // Si el correo no requiere verificación
                 showAlert('¡Registro exitoso! Redirigiendo...', 'success');
                 // Redirigir al login después de 2 segundos
                 setTimeout(() => {
                     window.location.href = 'login.html';
                 }, 2000);
-            } else {
-                showAlert(result.message || 'Error en el registro. Por favor, inténtalo de nuevo.', 'danger');
             }
         } catch (error) {
             console.error('Error:', error);
