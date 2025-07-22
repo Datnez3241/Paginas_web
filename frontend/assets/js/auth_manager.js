@@ -453,9 +453,23 @@ class AuthManager {
                 return { success: false, error };
             }
             
-            // Configuración por defecto para el reset
+            // Configuración por defecto para el reset - CORREGIDA PARA VERCEL CON FRONTEND
+            // Detectar la ruta correcta basada en la ubicación actual
+            const currentPath = window.location.pathname;
+            const isVercel = window.location.hostname.includes('vercel.app');
+            
+            let redirectPath;
+            if (isVercel) {
+                // En Vercel, usar la ruta completa con frontend
+                redirectPath = '/frontend/views/reset_password_page.html';
+            } else {
+                // En desarrollo local
+                const basePath = currentPath.includes('/views/') ? '/views/' : '/';
+                redirectPath = `${basePath}reset_password_page.html`;
+            }
+            
             const resetOptions = {
-                redirectTo: options.redirectTo || `${window.location.origin}/reset-password.html`,
+                redirectTo: options.redirectTo || `${window.location.origin}${redirectPath}`,
                 ...options
             };
             
