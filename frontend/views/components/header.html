@@ -33,7 +33,7 @@
                         <i class="fa-solid fa-cart-shopping"></i>
                         <span class="d-none d-md-inline">Carrito</span>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
-                              style="font-size: 0.6rem; padding: 0.25em 0.5em;">0</span>
+                              style="font-size: 0.6rem; padding: 0.25em 0.5em;" id="cart-badge">0</span>
                     </a>
                 </div>
 
@@ -113,100 +113,3 @@
         </div>
     </div>
 </header>
-
-<script>
-// Este script se ejecutará cuando el documento esté listo
-document.addEventListener('DOMContentLoaded', function() {
-    updateAuthUI();
-    
-    // Suscribirse a cambios de autenticación
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-        updateAuthUI(session);
-    });
-    
-    // Limpiar la suscripción cuando el componente se desmonte
-    return () => subscription?.unsubscribe();
-});
-
-// Función para actualizar la interfaz según el estado de autenticación
-async function updateAuthUI(session = null) {
-    try {
-        // Obtener la sesión actual si no se proporciona
-        if (!session) {
-            const { data: { session: currentSession } } = await supabase.auth.getSession();
-            session = currentSession;
-        }
-        
-        if (session) {
-            // Obtener datos del perfil del usuario
-            const { data: profile, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
-            
-            // Mostrar nombre de usuario en el botón
-            const userNameElement = document.getElementById('userName');
-            const userDisplayName = document.getElementById('userDisplayName');
-            const displayName = (profile?.nombre || session.user.user_metadata?.full_name || 'Mi cuenta');
-            
-            userNameElement.textContent = displayName;
-            userDisplayName.textContent = displayName;
-            userDisplayName.classList.remove('d-none');
-            
-            // Actualizar encabezado del menú desplegable
-            document.getElementById('userInfoHeader').classList.remove('d-none');
-            document.getElementById('userMenuDivider').classList.remove('d-none');
-            document.getElementById('menuUserName').textContent = displayName;
-            document.getElementById('menuUserEmail').textContent = session.user.email;
-            
-            // Mostrar/ocultar elementos del menú
-            document.getElementById('loginMenuItem').classList.add('d-none');
-            document.getElementById('registerMenuItem').classList.add('d-none');
-            document.getElementById('profileMenuItem').classList.remove('d-none');
-            document.getElementById('ordersMenuItem').classList.remove('d-none');
-            document.getElementById('logoutDivider').classList.remove('d-none');
-            document.getElementById('logoutMenuItem').classList.remove('d-none');
-            
-            // Verificar si es administrador
-            if (profile && profile.rol === 'admin') {
-                document.getElementById('adminMenuItem').classList.remove('d-none');
-            } else {
-                document.getElementById('adminMenuItem').classList.add('d-none');
-            }
-        } else {
-            // Usuario no autenticado
-            document.getElementById('userName').textContent = 'Cuenta';
-            document.getElementById('userDisplayName').classList.add('d-none');
-            document.getElementById('userInfoHeader').classList.add('d-none');
-            document.getElementById('userMenuDivider').classList.add('d-none');
-            document.getElementById('loginMenuItem').classList.remove('d-none');
-            document.getElementById('registerMenuItem').classList.remove('d-none');
-            document.getElementById('profileMenuItem').classList.add('d-none');
-            document.getElementById('ordersMenuItem').classList.add('d-none');
-            document.getElementById('adminMenuItem').classList.add('d-none');
-            document.getElementById('logoutDivider').classList.add('d-none');
-            document.getElementById('logoutMenuItem').classList.add('d-none');
-        }
-    } catch (error) {
-        console.error('Error al actualizar la interfaz de usuario:', error);
-    }
-}
-
-// Función para cerrar sesión
-async function cerrarSesion() {
-    try {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
-        
-        // Redirigir a la página de inicio
-        window.location.href = '/';
-    } catch (error) {
-        console.error('Error al cerrar sesión:', error);
-        alert('Ocurrió un error al cerrar la sesión. Por favor, inténtalo de nuevo.');
-    }
-}
-
-// Hacer la función accesible globalmente
-window.cerrarSesion = cerrarSesion;
-</script>

@@ -87,13 +87,16 @@
                     <div class="mb-3">
                         <label for="contrasena" class="form-label">Contraseña</label>
                         <div class="input-group">
-                            <input type="password" class="form-control" id="contrasena" name="contrasena" required minlength="6">
+                            <input type="password" class="form-control" id="contrasena" name="contrasena" required minlength="8">
                             <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
                         <div class="invalid-feedback">
-                            La contraseña debe tener al menos 6 caracteres.
+                            La contraseña debe tener al menos 8 caracteres.
+                        </div>
+                        <div class="form-text">
+                            La contraseña debe contener al menos 8 caracteres para mayor seguridad.
                         </div>
                     </div>
                     
@@ -221,7 +224,40 @@
         setupPasswordToggle('confirmar_contrasena', 'toggleConfirmPassword');
     });
 
-    // Manejar el envío del formulario de registro
+    // FUNCIÓN AUXILIAR PARA CREAR PERFIL DIRECTAMENTE
+    async function createUserProfileDirectly(userId, nombreCompleto, email) {
+        try {
+            console.log('📝 Creando perfil directamente para:', { userId, nombreCompleto, email });
+            
+            const profileData = {
+                id: userId,
+                nombre: nombreCompleto, // Usar el nombre que se proporcionó en el registro
+                email: email,
+                rol: 'cliente',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+
+            const { data, error } = await supabase
+                .from('profiles')
+                .insert([profileData])
+                .select()
+                .single();
+
+            if (error) {
+                console.error('❌ Error al crear perfil directamente:', error);
+                throw error;
+            }    
+            
+            console.log('✅ Perfil creado directamente:', data);
+            return { success: true, profile: data };
+        } catch (error) {
+            console.error('❌ Error inesperado al crear perfil directamente:', error);
+            throw error;
+        }
+    }
+
+    // MANEJAR EL ENVÍO DEL FORMULARIO DE REGISTRO - VERSIÓN CORREGIDA
     document.getElementById('registerForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
@@ -230,7 +266,6 @@
         const originalButtonText = submitButton.innerHTML;
         
         console.log('=== INICIO DE VALIDACIÓN ===');
-        console.log('Formulario:', form);
         
         // Validar formato de correo electrónico
         const email = document.getElementById('correo').value.trim();
@@ -245,20 +280,8 @@
         let isValid = true;
         
         requiredFields.forEach(field => {
-            const isValidField = field.checkValidity();
-            console.log(`Campo: ${field.name || field.id}`, {
-                valor: field.value,
-                valido: isValidField,
-                validacion: field.validity,
-                required: field.required,
-                pattern: field.pattern,
-                minLength: field.minLength,
-                type: field.type
-            });
-            
-            if (!isValidField) {
+            if (!field.checkValidity()) {
                 isValid = false;
-                // Mostrar mensaje de error específico
                 const feedback = field.nextElementSibling;
                 if (feedback && feedback.classList.contains('invalid-feedback')) {
                     feedback.style.display = 'block';
@@ -286,8 +309,8 @@
         }
         
         // Validar longitud mínima de contraseña
-        if (contrasena.length < 6) {
-            showAlert('La contraseña debe tener al menos 6 caracteres.', 'warning');
+        if (contrasena.length < 8) {
+            showAlert('La contraseña debe tener al menos 8 caracteres.', 'warning');
             return;
         }
         
@@ -298,40 +321,37 @@
         try {
             // Obtener valores directamente de los campos
             const userData = {
-                nombre_completo: document.getElementById('nombre_completo').value,
-                correo: document.getElementById('correo').value,
-                contrasena: document.getElementById('contrasena').value,
-                confirmar_contrasena: document.getElementById('confirmar_contrasena').value
+                nombre_completo: document.getElementById('nombre_completo').value.trim(),
+                correo: document.getElementById('correo').value.trim().toLowerCase(),
+                contrasena: document.getElementById('contrasena').value
             };
             
-            console.log('Enviando datos:', userData);
+            console.log('🚀 Registrando usuario:', { nombre: userData.nombre_completo, email: userData.correo });
             
-            // Intentar registrar directamente con Supabase Auth
-            // La verificación de correo existente se manejará automáticamente
-            // Primero, registrar el usuario en Auth
+            // MEJORADO: Registrar con ambos campos de nombre
             const { data, error } = await supabase.auth.signUp({
-                email: userData.correo.trim().toLowerCase(),
+                email: userData.correo,
                 password: userData.contrasena,
                 options: {
                     data: {
-                        full_name: userData.nombre_completo.trim(),
-                        email: userData.correo.trim().toLowerCase()
+                        nombre_completo: userData.nombre_completo,
+                        full_name: userData.nombre_completo,
+                        name: userData.nombre_completo // Campo adicional por compatibilidad
                     },
                     emailRedirectTo: window.location.origin + '/login.html'
                 }
             });
             
             if (error) {
-                console.error('Error en registro Supabase:', error);
+                console.error('❌ Error en registro Supabase:', error);
                 let errorMessage = 'Error en el registro. ';
                 
-                // Manejar diferentes tipos de errores de Supabase
                 if (error.message.includes('already registered') || error.message.includes('already in use')) {
                     errorMessage = 'Este correo electrónico ya está registrado. Por favor, inicia sesión o utiliza otro correo.';
                 } else if (error.message.includes('valid email') || error.message.includes('must be a valid')) {
                     errorMessage = 'Por favor ingresa un correo electrónico válido.';
                 } else if (error.message.includes('password')) {
-                    errorMessage = 'La contraseña debe tener al menos 6 caracteres.';
+                    errorMessage = 'La contraseña debe tener al menos 8 caracteres.';
                 } else if (error.message.includes('email')) {
                     errorMessage = 'El formato del correo electrónico no es válido.';
                 } else {
@@ -342,23 +362,36 @@
                 return;
             }
             
-            // Si el registro fue exitoso pero requiere verificación de correo
-            if (data.user && !data.user.identities) {
-                showAlert('¡Registro exitoso! Por favor verifica tu correo electrónico para activar tu cuenta.', 'success');
-                // Redirigir al login después de 3 segundos
+            // NUEVO: Crear perfil inmediatamente si es posible
+            if (data.user) {
+                console.log('✅ Usuario registrado exitosamente:', data.user);
+                
+                // Esperar un momento para que los metadatos estén disponibles
+                setTimeout(async () => {
+                    try {
+                        // Crear perfil directamente con los datos que tenemos
+                        await createUserProfileDirectly(data.user.id, userData.nombre_completo, userData.correo);
+                    } catch (profileError) {
+                        console.warn('⚠️ No se pudo crear el perfil inmediatamente:', profileError);
+                        // No es crítico, se puede crear después cuando haga login
+                    }
+                }, 1000);
+                
+                // Mostrar mensaje de éxito
+                if (!data.user.email_confirmed_at) {
+                    showAlert('¡Registro exitoso! Por favor verifica tu correo electrónico para activar tu cuenta.', 'success');
+                } else {
+                    showAlert('¡Registro exitoso! Redirigiendo...', 'success');
+                }
+                
+                // Redirigir al login después de unos segundos
                 setTimeout(() => {
                     window.location.href = 'login.html';
                 }, 3000);
-            } else if (data.user) {
-                // Si el correo no requiere verificación
-                showAlert('¡Registro exitoso! Redirigiendo...', 'success');
-                // Redirigir al login después de 2 segundos
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 2000);
             }
+            
         } catch (error) {
-            console.error('Error:', error);
+            console.error('❌ Error inesperado:', error);
             showAlert('Error al conectar con el servidor. Por favor, inténtalo más tarde.', 'danger');
         } finally {
             // Restaurar el botón
