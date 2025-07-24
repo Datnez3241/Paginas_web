@@ -1,4 +1,8 @@
-// auth-manager.js - Gestor centralizado de autenticación con recuperación de contraseña
+// =====================================================
+// AUTH-MANAGER.JS - VERSIÓN ACTUALIZADA Y MEJORADA
+// Gestor centralizado de autenticación con todas las funcionalidades
+// =====================================================
+
 class AuthManager {
     // Estados de autenticación
     static AUTH_STATES = {
@@ -16,7 +20,8 @@ class AuthManager {
         LOGOUT_SUCCESS: 'logoutSuccess',
         PROFILE_UPDATED: 'profileUpdated',
         PASSWORD_RESET_SENT: 'passwordResetSent',
-        PASSWORD_RESET_ERROR: 'passwordResetError'
+        PASSWORD_RESET_ERROR: 'passwordResetError',
+        CART_UPDATED: 'cartUpdated' // Nuevo evento para el carrito
     };
     
     constructor() {
@@ -25,6 +30,8 @@ class AuthManager {
         this.currentProfile = null;
         this.authState = AuthManager.AUTH_STATES.LOADING;
         this.eventTarget = new EventTarget();
+        this.retryCount = 0;
+        this.maxRetries = 3;
     }
 
     // Método para suscribirse a eventos
@@ -36,7 +43,13 @@ class AuthManager {
     // Disparar eventos personalizados
     _dispatchEvent(event, detail = {}) {
         const customEvent = new CustomEvent(event, { 
-            detail: { ...detail, authState: this.authState, user: this.currentUser }
+            detail: { 
+                ...detail, 
+                authState: this.authState, 
+                user: this.currentUser,
+                profile: this.currentProfile,
+                timestamp: new Date().toISOString()
+            }
         });
         this.eventTarget.dispatchEvent(customEvent);
     }
@@ -46,58 +59,127 @@ class AuthManager {
         if (this.initialized) return;
         
         try {
+            console.log('🚀 Inicializando AuthManager...');
+            
             // Verificar si Supabase está disponible
             if (typeof supabase === 'undefined') {
-                const error = new Error('Supabase no está disponible');
+                const error = new Error('Supabase no está disponible - Verificar que el script esté cargado');
                 this._handleError(error);
                 return;
             }
             
             this._setAuthState(AuthManager.AUTH_STATES.LOADING);
 
-            // Obtener sesión actual
-            const { data: { session }, error } = await supabase.auth.getSession();
-            if (error) {
-                this._handleError(error);
+            // Obtener sesión actual con reintentos
+            const sessionResult = await this._getSessionWithRetry();
+            if (!sessionResult.success) {
+                this._handleError(new Error(sessionResult.error));
                 return;
             }
 
-            if (session) {
+            const session = sessionResult.session;
+
+            if (session && session.user) {
+                console.log('✅ Sesión existente encontrada:', session.user.email);
                 this.currentUser = session.user;
                 await this.loadUserProfile();
                 this._setAuthState(AuthManager.AUTH_STATES.AUTHENTICATED);
             } else {
+                console.log('ℹ️ No hay sesión activa');
                 this._setAuthState(AuthManager.AUTH_STATES.UNAUTHENTICATED);
             }
 
             // Configurar listener para cambios de estado
             supabase.auth.onAuthStateChange(async (event, session) => {
-                console.log('Estado de auth cambió:', event);
+                console.log('🔄 Estado de auth cambió:', event, session?.user?.email || 'sin usuario');
                 
-                if (event === 'SIGNED_IN' && session) {
-                    this.currentUser = session.user;
-                    await this.loadUserProfile();
-                    this._setAuthState(AuthManager.AUTH_STATES.AUTHENTICATED);
-                } else if (event === 'SIGNED_OUT') {
-                    this.currentUser = null;
-                    this.currentProfile = null;
-                    this._setAuthState(AuthManager.AUTH_STATES.UNAUTHENTICATED);
-                } else if (event === 'PASSWORD_RECOVERY') {
-                    console.log('🔐 Proceso de recuperación de contraseña iniciado');
+                try {
+                    switch (event) {
+                        case 'SIGNED_IN':
+                            if (session && session.user) {
+                                this.currentUser = session.user;
+                                await this.loadUserProfile();
+                                this._setAuthState(AuthManager.AUTH_STATES.AUTHENTICATED);
+                                this._dispatchEvent(AuthManager.EVENTS.LOGIN_SUCCESS, { user: session.user });
+                            }
+                            break;
+                            
+                        case 'SIGNED_OUT':
+                            this.currentUser = null;
+                            this.currentProfile = null;
+                            this._setAuthState(AuthManager.AUTH_STATES.UNAUTHENTICATED);
+                            this._dispatchEvent(AuthManager.EVENTS.LOGOUT_SUCCESS);
+                            break;
+                            
+                        case 'PASSWORD_RECOVERY':
+                            console.log('🔐 Proceso de recuperación de contraseña iniciado');
+                            break;
+                            
+                        case 'TOKEN_REFRESHED':
+                            console.log('🔄 Token refrescado automáticamente');
+                            if (session && session.user) {
+                                this.currentUser = session.user;
+                            }
+                            break;
+                            
+                        case 'USER_UPDATED':
+                            console.log('👤 Datos de usuario actualizados');
+                            if (session && session.user) {
+                                this.currentUser = session.user;
+                                await this.loadUserProfile();
+                            }
+                            break;
+                    }
+                    
+                    // Actualizar UI en todas las páginas
+                    await this.updateHeaderUI();
+                    
+                } catch (error) {
+                    console.error('❌ Error en onAuthStateChange:', error);
                 }
-                
-                // Actualizar UI en todas las páginas
-                await this.updateHeaderUI();
             });
 
             // Actualizar UI inicial
             await this.updateHeaderUI();
             this.initialized = true;
+            
+            console.log('✅ AuthManager inicializado correctamente');
             this._dispatchEvent(AuthManager.EVENTS.AUTH_STATE_CHANGED, { 
-                state: this.authState 
+                state: this.authState,
+                initialized: true
             });
+            
         } catch (error) {
+            console.error('❌ Error crítico inicializando AuthManager:', error);
             this._handleError(error);
+        }
+    }
+
+    // Obtener sesión con reintentos
+    async _getSessionWithRetry() {
+        for (let i = 0; i < this.maxRetries; i++) {
+            try {
+                console.log(`🔄 Obteniendo sesión (intento ${i + 1}/${this.maxRetries})...`);
+                
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error) {
+                    console.warn(`⚠️ Error en intento ${i + 1}:`, error.message);
+                    if (i === this.maxRetries - 1) {
+                        throw error;
+                    }
+                    // Esperar antes del siguiente intento
+                    await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+                    continue;
+                }
+                
+                return { success: true, session };
+                
+            } catch (error) {
+                if (i === this.maxRetries - 1) {
+                    return { success: false, error: error.message };
+                }
+            }
         }
     }
 
@@ -105,14 +187,19 @@ class AuthManager {
     _handleError(error, context = 'Error en AuthManager') {
         console.error(`${context}:`, error);
         this._setAuthState(AuthManager.AUTH_STATES.ERROR, error);
-        return { success: false, error };
+        return { success: false, error: error.message || error };
     }
 
     // Actualizar estado de autenticación
     _setAuthState(state, error = null) {
+        const previousState = this.authState;
         this.authState = state;
+        
+        console.log(`🔄 Estado cambiado: ${previousState} → ${state}`);
+        
         this._dispatchEvent(AuthManager.EVENTS.AUTH_STATE_CHANGED, { 
             state, 
+            previousState,
             error,
             user: this.currentUser,
             profile: this.currentProfile
@@ -121,7 +208,10 @@ class AuthManager {
 
     // Cargar perfil del usuario
     async loadUserProfile() {
-        if (!this.currentUser) return { success: false, error: 'No hay usuario autenticado' };
+        if (!this.currentUser) {
+            console.warn('⚠️ No hay usuario autenticado para cargar perfil');
+            return { success: false, error: 'No hay usuario autenticado' };
+        }
         
         try {
             console.log('🔍 Cargando perfil del usuario:', this.currentUser.id);
@@ -133,9 +223,13 @@ class AuthManager {
                 .single();
 
             if (error) {
-                console.warn('⚠️ Perfil no encontrado, creando uno nuevo...', error);
-                // Crear perfil si no existe
-                return await this.createUserProfile();
+                if (error.code === 'PGRST116') {
+                    // No encontrado - crear perfil
+                    console.log('📝 Perfil no encontrado, creando uno nuevo...');
+                    return await this.createUserProfile();
+                } else {
+                    throw error;
+                }
             } else {
                 console.log('✅ Perfil cargado:', profile);
                 this.currentProfile = profile;
@@ -143,6 +237,7 @@ class AuthManager {
                 return { success: true, profile };
             }
         } catch (error) {
+            console.error('❌ Error cargando perfil:', error);
             return this._handleError(error, 'Error al cargar perfil del usuario');
         }
     }
@@ -154,31 +249,12 @@ class AuthManager {
         }
 
         try {
-            console.log('📝 Creando perfil para usuario:', this.currentUser);
+            console.log('📝 Creando perfil para usuario:', this.currentUser.email);
             
-            // Obtener el nombre desde diferentes fuentes
-            let nombre = 'Usuario'; // Valor por defecto
+            // Obtener el nombre desde diferentes fuentes con prioridades
+            let nombre = this._extractUserName();
             
-            // Prioridad 1: user_metadata.nombre_completo
-            if (this.currentUser.user_metadata?.nombre_completo) {
-                nombre = this.currentUser.user_metadata.nombre_completo;
-                console.log('✅ Nombre desde user_metadata.nombre_completo:', nombre);
-            }
-            // Prioridad 2: user_metadata.full_name  
-            else if (this.currentUser.user_metadata?.full_name) {
-                nombre = this.currentUser.user_metadata.full_name;
-                console.log('✅ Nombre desde user_metadata.full_name:', nombre);
-            }
-            // Prioridad 3: primera parte del email
-            else if (this.currentUser.email) {
-                const emailPart = this.currentUser.email.split('@')[0];
-                if (emailPart && emailPart !== 'usuario') {
-                    nombre = emailPart;
-                    console.log('✅ Nombre desde email:', nombre);
-                }
-            }
-            
-            console.log('📝 Nombre final para el perfil:', nombre);
+            console.log('📝 Nombre extraído para el perfil:', nombre);
 
             const profileData = {
                 id: this.currentUser.id,
@@ -206,108 +282,167 @@ class AuthManager {
             this.currentProfile = data;
             this._dispatchEvent(AuthManager.EVENTS.PROFILE_UPDATED, { profile: data });
             return { success: true, profile: data };
+            
         } catch (error) {
             console.error('❌ Error inesperado al crear perfil:', error);
             return this._handleError(error, 'Error inesperado al crear perfil');
         }
     }
 
-    // Actualizar interfaz del header - CORREGIDO PARA EVITAR DUPLICACIÓN
+    // Extraer nombre del usuario de diferentes fuentes
+    _extractUserName() {
+        // Prioridad 1: user_metadata.nombre_completo
+        if (this.currentUser.user_metadata?.nombre_completo) {
+            console.log('✅ Nombre desde user_metadata.nombre_completo:', this.currentUser.user_metadata.nombre_completo);
+            return this.currentUser.user_metadata.nombre_completo;
+        }
+        
+        // Prioridad 2: user_metadata.full_name  
+        if (this.currentUser.user_metadata?.full_name) {
+            console.log('✅ Nombre desde user_metadata.full_name:', this.currentUser.user_metadata.full_name);
+            return this.currentUser.user_metadata.full_name;
+        }
+        
+        // Prioridad 3: primera parte del email
+        if (this.currentUser.email) {
+            const emailPart = this.currentUser.email.split('@')[0];
+            if (emailPart && emailPart !== 'usuario' && emailPart.length > 2) {
+                console.log('✅ Nombre desde email:', emailPart);
+                return emailPart.charAt(0).toUpperCase() + emailPart.slice(1);
+            }
+        }
+        
+        // Valor por defecto
+        console.log('ℹ️ Usando nombre por defecto: Usuario');
+        return 'Usuario';
+    }
+
+    // Actualizar interfaz del header
     async updateHeaderUI() {
         try {
             const isAuthenticated = !!this.currentUser;
             console.log('🔄 Actualizando UI del header. Autenticado:', isAuthenticated);
             
-            // Elementos del header
-            const userNameElement = document.getElementById('userName');
-            const userDisplayName = document.getElementById('userDisplayName');
-            const userInfoHeader = document.getElementById('userInfoHeader');
-            const userMenuDivider = document.getElementById('userMenuDivider');
-            const menuUserName = document.getElementById('menuUserName');
-            const menuUserEmail = document.getElementById('menuUserEmail');
+            // Esperar un poco para asegurar que el DOM esté listo
+            await new Promise(resolve => setTimeout(resolve, 100));
             
-            // Elementos del menú
-            const loginMenuItem = document.getElementById('loginMenuItem');
-            const registerMenuItem = document.getElementById('registerMenuItem');
-            const profileMenuItem = document.getElementById('profileMenuItem');
-            const ordersMenuItem = document.getElementById('ordersMenuItem');
-            const adminMenuItem = document.getElementById('adminMenuItem');
-            const logoutDivider = document.getElementById('logoutDivider');
-            const logoutMenuItem = document.getElementById('logoutMenuItem');
+            // Elementos del header
+            const elements = {
+                userName: document.getElementById('userName'),
+                userDisplayName: document.getElementById('userDisplayName'),
+                userInfoHeader: document.getElementById('userInfoHeader'),
+                userMenuDivider: document.getElementById('userMenuDivider'),
+                menuUserName: document.getElementById('menuUserName'),
+                menuUserEmail: document.getElementById('menuUserEmail'),
+                mobileUserName: document.getElementById('mobileUserName'),
+                mobileUserEmail: document.getElementById('mobileUserEmail'),
+                
+                // Menu items
+                loginMenuItem: document.getElementById('loginMenuItem'),
+                registerMenuItem: document.getElementById('registerMenuItem'),
+                profileMenuItem: document.getElementById('profileMenuItem'),
+                ordersMenuItem: document.getElementById('ordersMenuItem'),
+                adminMenuItem: document.getElementById('adminMenuItem'),
+                logoutDivider: document.getElementById('logoutDivider'),
+                logoutMenuItem: document.getElementById('logoutMenuItem'),
+                
+                // Mobile actions
+                mobileGuestActions: document.getElementById('mobileGuestActions'),
+                mobileUserActions: document.getElementById('mobileUserActions'),
+                mobileAdminAction: document.getElementById('mobileAdminAction')
+            };
 
             if (isAuthenticated) {
-                // Obtener nombre para mostrar
+                // Usuario autenticado
                 const displayName = this.getDisplayName();
                 console.log('👤 Nombre a mostrar:', displayName);
                 
-                // CORREGIDO: Solo actualizar userName, ocultar userDisplayName
-                if (userNameElement) {
-                    userNameElement.textContent = displayName;
-                    console.log('✅ userNameElement actualizado:', displayName);
+                // Actualizar elementos principales
+                if (elements.userName) {
+                    elements.userName.textContent = displayName;
+                    console.log('✅ userName actualizado:', displayName);
                 }
                 
-                // IMPORTANTE: Ocultar userDisplayName para evitar duplicación
-                if (userDisplayName) {
-                    userDisplayName.classList.add('d-none');
-                    userDisplayName.textContent = ''; // Limpiar contenido
-                    console.log('✅ userDisplayName ocultado para evitar duplicación');
+                // Ocultar userDisplayName para evitar duplicación
+                if (elements.userDisplayName) {
+                    elements.userDisplayName.classList.add('d-none');
+                    elements.userDisplayName.textContent = '';
                 }
                 
-                // Actualizar header del menú dropdown
-                if (userInfoHeader) userInfoHeader.classList.remove('d-none');
-                if (userMenuDivider) userMenuDivider.classList.remove('d-none');
-                if (menuUserName) {
-                    menuUserName.textContent = displayName;
-                    console.log('✅ menuUserName actualizado:', displayName);
-                }
-                if (menuUserEmail) menuUserEmail.textContent = this.currentUser.email;
+                // Actualizar menú dropdown
+                if (elements.userInfoHeader) elements.userInfoHeader.classList.remove('d-none');
+                if (elements.userMenuDivider) elements.userMenuDivider.classList.remove('d-none');
+                if (elements.menuUserName) elements.menuUserName.textContent = displayName;
+                if (elements.menuUserEmail) elements.menuUserEmail.textContent = this.currentUser.email;
                 
-                // Ocultar opciones de login/register
-                if (loginMenuItem) loginMenuItem.classList.add('d-none');
-                if (registerMenuItem) registerMenuItem.classList.add('d-none');
+                // Actualizar elementos móviles
+                if (elements.mobileUserName) elements.mobileUserName.textContent = displayName;
+                if (elements.mobileUserEmail) elements.mobileUserEmail.textContent = this.currentUser.email;
+                
+                // Ocultar opciones de invitado
+                if (elements.loginMenuItem) elements.loginMenuItem.classList.add('d-none');
+                if (elements.registerMenuItem) elements.registerMenuItem.classList.add('d-none');
+                if (elements.mobileGuestActions) elements.mobileGuestActions.classList.add('d-none');
                 
                 // Mostrar opciones de usuario autenticado
-                if (profileMenuItem) profileMenuItem.classList.remove('d-none');
-                if (ordersMenuItem) ordersMenuItem.classList.remove('d-none');
-                if (logoutDivider) logoutDivider.classList.remove('d-none');
-                if (logoutMenuItem) logoutMenuItem.classList.remove('d-none');
+                if (elements.profileMenuItem) elements.profileMenuItem.classList.remove('d-none');
+                if (elements.ordersMenuItem) elements.ordersMenuItem.classList.remove('d-none');
+                if (elements.logoutDivider) elements.logoutDivider.classList.remove('d-none');
+                if (elements.logoutMenuItem) elements.logoutMenuItem.classList.remove('d-none');
+                if (elements.mobileUserActions) elements.mobileUserActions.classList.remove('d-none');
                 
                 // Mostrar panel admin si corresponde
-                if (adminMenuItem) {
-                    if (this.currentProfile && this.currentProfile.rol === 'admin') {
-                        adminMenuItem.classList.remove('d-none');
+                const isAdmin = this.currentProfile?.rol === 'admin';
+                if (elements.adminMenuItem) {
+                    if (isAdmin) {
+                        elements.adminMenuItem.classList.remove('d-none');
                     } else {
-                        adminMenuItem.classList.add('d-none');
+                        elements.adminMenuItem.classList.add('d-none');
+                    }
+                }
+                if (elements.mobileAdminAction) {
+                    if (isAdmin) {
+                        elements.mobileAdminAction.classList.remove('d-none');
+                    } else {
+                        elements.mobileAdminAction.classList.add('d-none');
                     }
                 }
                 
             } else {
                 // Usuario no autenticado
-                if (userNameElement) {
-                    userNameElement.textContent = 'Cuenta';
-                    console.log('✅ userNameElement resetado a "Cuenta"');
+                if (elements.userName) {
+                    elements.userName.textContent = 'Cuenta';
+                    console.log('✅ userName resetado a "Cuenta"');
                 }
                 
-                // Asegurarse de que userDisplayName esté oculto
-                if (userDisplayName) {
-                    userDisplayName.classList.add('d-none');
-                    userDisplayName.textContent = '';
+                // Ocultar elementos de usuario autenticado
+                if (elements.userDisplayName) {
+                    elements.userDisplayName.classList.add('d-none');
+                    elements.userDisplayName.textContent = '';
                 }
+                if (elements.userInfoHeader) elements.userInfoHeader.classList.add('d-none');
+                if (elements.userMenuDivider) elements.userMenuDivider.classList.add('d-none');
+                if (elements.mobileUserActions) elements.mobileUserActions.classList.add('d-none');
                 
-                if (userInfoHeader) userInfoHeader.classList.add('d-none');
-                if (userMenuDivider) userMenuDivider.classList.add('d-none');
+                // Actualizar elementos móviles para invitados
+                if (elements.mobileUserName) elements.mobileUserName.textContent = 'Invitado';
+                if (elements.mobileUserEmail) elements.mobileUserEmail.textContent = 'Inicia sesión para ver tu cuenta';
                 
-                // Mostrar opciones de login/register
-                if (loginMenuItem) loginMenuItem.classList.remove('d-none');
-                if (registerMenuItem) registerMenuItem.classList.remove('d-none');
+                // Mostrar opciones de invitado
+                if (elements.loginMenuItem) elements.loginMenuItem.classList.remove('d-none');
+                if (elements.registerMenuItem) elements.registerMenuItem.classList.remove('d-none');
+                if (elements.mobileGuestActions) elements.mobileGuestActions.classList.remove('d-none');
                 
                 // Ocultar opciones de usuario autenticado
-                if (profileMenuItem) profileMenuItem.classList.add('d-none');
-                if (ordersMenuItem) ordersMenuItem.classList.add('d-none');
-                if (adminMenuItem) adminMenuItem.classList.add('d-none');
-                if (logoutDivider) logoutDivider.classList.add('d-none');
-                if (logoutMenuItem) logoutMenuItem.classList.add('d-none');
+                if (elements.profileMenuItem) elements.profileMenuItem.classList.add('d-none');
+                if (elements.ordersMenuItem) elements.ordersMenuItem.classList.add('d-none');
+                if (elements.adminMenuItem) elements.adminMenuItem.classList.add('d-none');
+                if (elements.logoutDivider) elements.logoutDivider.classList.add('d-none');
+                if (elements.logoutMenuItem) elements.logoutMenuItem.classList.add('d-none');
+                if (elements.mobileAdminAction) elements.mobileAdminAction.classList.add('d-none');
             }
+            
+            console.log('✅ UI del header actualizada correctamente');
             
         } catch (error) {
             console.error('❌ Error al actualizar UI del header:', error);
@@ -317,33 +452,28 @@ class AuthManager {
     // Obtener nombre para mostrar
     getDisplayName() {
         // Prioridad 1: Nombre del perfil en la base de datos
-        if (this.currentProfile && this.currentProfile.nombre && this.currentProfile.nombre !== 'Usuario') {
-            console.log('📛 Nombre desde perfil:', this.currentProfile.nombre);
+        if (this.currentProfile?.nombre && this.currentProfile.nombre !== 'Usuario') {
             return this.currentProfile.nombre;
         }
         
         // Prioridad 2: user_metadata.nombre_completo
         if (this.currentUser?.user_metadata?.nombre_completo) {
-            console.log('📛 Nombre desde user_metadata.nombre_completo:', this.currentUser.user_metadata.nombre_completo);
             return this.currentUser.user_metadata.nombre_completo;
         }
         
         // Prioridad 3: user_metadata.full_name
         if (this.currentUser?.user_metadata?.full_name) {
-            console.log('📛 Nombre desde user_metadata.full_name:', this.currentUser.user_metadata.full_name);
             return this.currentUser.user_metadata.full_name;
         }
         
         // Prioridad 4: primera parte del email (si no es "usuario")
         if (this.currentUser?.email) {
             const emailPart = this.currentUser.email.split('@')[0];
-            if (emailPart && emailPart !== 'usuario') {
-                console.log('📛 Nombre desde email:', emailPart);
-                return emailPart;
+            if (emailPart && emailPart !== 'usuario' && emailPart.length > 2) {
+                return emailPart.charAt(0).toUpperCase() + emailPart.slice(1);
             }
         }
         
-        console.log('📛 Usando nombre por defecto: Mi cuenta');
         return 'Mi cuenta';
     }
 
@@ -352,23 +482,48 @@ class AuthManager {
         try {
             console.log('🔐 Intentando login para:', email);
             
+            // Validaciones básicas
+            if (!email || !password) {
+                throw new Error('Email y contraseña son requeridos');
+            }
+            
+            if (!this._isValidEmail(email)) {
+                throw new Error('Formato de email inválido');
+            }
+            
             const { data, error } = await supabase.auth.signInWithPassword({
-                email: email,
+                email: email.trim(),
                 password: password,
             });
             
             if (error) {
                 console.error('❌ Error de login:', error.message);
-                this._dispatchEvent(AuthManager.EVENTS.LOGIN_ERROR, { error: error.message });
-                return { success: false, error: error.message };
+                
+                // Personalizar mensajes de error
+                let userFriendlyError = error.message;
+                if (error.message.includes('Invalid login credentials')) {
+                    userFriendlyError = 'Credenciales incorrectas. Verifica tu email y contraseña.';
+                } else if (error.message.includes('Email not confirmed')) {
+                    userFriendlyError = 'Por favor confirma tu email antes de iniciar sesión.';
+                } else if (error.message.includes('Too many requests')) {
+                    userFriendlyError = 'Demasiados intentos. Intenta de nuevo en unos minutos.';
+                }
+                
+                this._dispatchEvent(AuthManager.EVENTS.LOGIN_ERROR, { 
+                    error: userFriendlyError,
+                    originalError: error.message,
+                    email 
+                });
+                return { success: false, error: userFriendlyError };
             }
             
-            console.log('✅ Login exitoso:', data);
-            this._dispatchEvent(AuthManager.EVENTS.LOGIN_SUCCESS, { user: data.user });
+            console.log('✅ Login exitoso:', data.user.email);
+            // El evento LOGIN_SUCCESS se disparará automáticamente en onAuthStateChange
             return { success: true, user: data.user };
+            
         } catch (err) {
             console.error('❌ Error inesperado en login:', err);
-            const errorMessage = 'Error inesperado al iniciar sesión';
+            const errorMessage = err.message || 'Error inesperado al iniciar sesión';
             this._dispatchEvent(AuthManager.EVENTS.LOGIN_ERROR, { error: errorMessage });
             return { success: false, error: errorMessage };
         }
@@ -379,32 +534,45 @@ class AuthManager {
         try {
             console.log('📝 Intentando registro para:', { nombre_completo, email });
             
-            // Validar longitud de la contraseña
+            // Validaciones
+            if (!nombre_completo || !email || !password) {
+                throw new Error('Todos los campos son requeridos');
+            }
+            
+            if (!this._isValidEmail(email)) {
+                throw new Error('Formato de email inválido');
+            }
+            
             if (password.length < 8) {
-                console.error('❌ La contraseña debe tener al menos 8 caracteres');
-                return { 
-                    success: false, 
-                    error: 'La contraseña debe tener al menos 8 caracteres' 
-                };
+                throw new Error('La contraseña debe tener al menos 8 caracteres');
             }
             
             const { data, error } = await supabase.auth.signUp({
-                email: email,
+                email: email.trim(),
                 password: password,
                 options: {
                     data: {
-                        nombre_completo: nombre_completo,
-                        full_name: nombre_completo
+                        nombre_completo: nombre_completo.trim(),
+                        full_name: nombre_completo.trim()
                     }
                 }
             });
             
             if (error) {
                 console.error('❌ Error de registro:', error.message);
-                return { success: false, error: error.message };
+                
+                // Personalizar mensajes de error
+                let userFriendlyError = error.message;
+                if (error.message.includes('User already registered')) {
+                    userFriendlyError = 'Ya existe una cuenta con este email.';
+                } else if (error.message.includes('Password should be')) {
+                    userFriendlyError = 'La contraseña no cumple con los requisitos mínimos.';
+                }
+                
+                return { success: false, error: userFriendlyError };
             }
             
-            console.log('✅ Registro exitoso:', data);
+            console.log('✅ Registro exitoso:', data.user?.email);
             
             // Si el usuario se registró pero necesita confirmar email
             if (data.user && !data.user.email_confirmed_at) {
@@ -417,9 +585,10 @@ class AuthManager {
             }
             
             return { success: true, user: data.user };
+            
         } catch (err) {
             console.error('❌ Error inesperado en registro:', err);
-            return { success: false, error: 'Error inesperado' };
+            return { success: false, error: err.message || 'Error inesperado' };
         }
     }
 
@@ -427,45 +596,36 @@ class AuthManager {
     async logout() {
         try {
             console.log('🚪 Cerrando sesión...');
+            
             const { error } = await supabase.auth.signOut();
             if (error) {
                 console.error('❌ Error al cerrar sesión:', error.message);
                 return { success: false, error: error.message };
             }
+            
             console.log('✅ Sesión cerrada exitosamente');
-            this._dispatchEvent(AuthManager.EVENTS.LOGOUT_SUCCESS);
+            // El evento LOGOUT_SUCCESS se disparará automáticamente en onAuthStateChange
             return { success: true };
+            
         } catch (err) {
             console.error('❌ Error inesperado al cerrar sesión:', err);
             return { success: false, error: 'Error inesperado' };
         }
     }
 
-    // NUEVA FUNCIONALIDAD: Método para recuperar contraseña
+    // Método para recuperar contraseña
     async resetPassword(email, options = {}) {
         try {
             console.log('🔐 Enviando correo de recuperación para:', email);
             
             // Validar email
-            if (!email || !email.includes('@')) {
+            if (!email || !this._isValidEmail(email)) {
                 const error = 'Por favor ingresa un correo electrónico válido';
                 this._dispatchEvent(AuthManager.EVENTS.PASSWORD_RESET_ERROR, { error });
                 return { success: false, error };
             }
             
-            // Configuración por defecto para el reset - CORREGIDA PARA TU ESTRUCTURA
-            // Detectar la ruta correcta basada en la ubicación actual
-            const currentPath = window.location.pathname;
-            const basePath = currentPath.includes('/views/') ? '/views/' : '/';
-            
-            const resetOptions = {
-                redirectTo: options.redirectTo || `${window.location.origin}${basePath}reset_password_page.html`,
-                ...options
-            };
-            
-            console.log('📧 Opciones de reset:', resetOptions);
-            
-            const { error } = await supabase.auth.resetPasswordForEmail(email, resetOptions);
+            const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), options);
             
             if (error) {
                 console.error('❌ Error al enviar correo de recuperación:', error.message);
@@ -512,7 +672,7 @@ class AuthManager {
         }
     }
 
-    // NUEVA FUNCIONALIDAD: Método para actualizar contraseña con token
+    // Método para actualizar contraseña con token
     async updatePassword(newPassword, accessToken = null) {
         try {
             console.log('🔐 Actualizando contraseña...');
@@ -527,7 +687,7 @@ class AuthManager {
             if (accessToken) {
                 const { error: sessionError } = await supabase.auth.setSession({
                     access_token: accessToken,
-                    refresh_token: '' // Solo necesitamos el access_token para reset
+                    refresh_token: ''
                 });
                 
                 if (sessionError) {
@@ -566,32 +726,66 @@ class AuthManager {
         }
     }
 
-    // Verificar si el usuario está autenticado
-    isAuthenticated() {
-        return !!this.currentUser;
+    // Funciones de utilidad
+    _isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
     }
 
-    // Obtener usuario actual
+    // Métodos públicos de estado
+    isAuthenticated() {
+        return !!this.currentUser && this.authState === AuthManager.AUTH_STATES.AUTHENTICATED;
+    }
+
     getCurrentUser() {
         return this.currentUser;
     }
 
-    // Obtener perfil actual
     getCurrentProfile() {
         return this.currentProfile;
     }
+
+    getAuthState() {
+        return this.authState;
+    }
+
+    isLoading() {
+        return this.authState === AuthManager.AUTH_STATES.LOADING;
+    }
+
+    hasError() {
+        return this.authState === AuthManager.AUTH_STATES.ERROR;
+    }
+
+    isAdmin() {
+        return this.currentProfile?.rol === 'admin';
+    }
+
+    // Método para refrescar perfil
+    async refreshProfile() {
+        if (this.currentUser) {
+            return await this.loadUserProfile();
+        }
+        return { success: false, error: 'No hay usuario autenticado' };
+    }
 }
+
+// =====================================================
+// INICIALIZACIÓN GLOBAL
+// =====================================================
 
 // Crear instancia global del gestor de autenticación
 window.authManager = new AuthManager();
 
-// Función global para cerrar sesión (compatibilidad con header existente)
+// Funciones globales de compatibilidad
 window.cerrarSesion = async function() {
     try {
         const result = await window.authManager.logout();
         if (result.success) {
-            // Redirigir a la página de inicio
-            window.location.href = '/';
+            // Redirigir a la página de inicio después de un breve delay
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 500);
         } else {
             throw new Error(result.error);
         }
@@ -606,7 +800,6 @@ window.resetPassword = async function(email, options = {}) {
     if (window.authManager) {
         return await window.authManager.resetPassword(email, options);
     } else {
-        // Fallback si authManager no está disponible
         console.warn('AuthManager no disponible, usando función legacy');
         try {
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -632,16 +825,20 @@ window.navigateTo = function(url) {
 // Auto-inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('🚀 DOM listo, inicializando AuthManager...');
-    await window.authManager.init();
+    try {
+        await window.authManager.init();
+    } catch (error) {
+        console.error('❌ Error inicializando AuthManager:', error);
+    }
 });
 
 // También inicializar si el DOM ya está listo
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', async function() {
-        await window.authManager.init();
-    });
-} else {
-    // DOM ya está listo
+if (document.readyState !== 'loading') {
     console.log('🚀 DOM ya listo, inicializando AuthManager...');
-    window.authManager.init();
+    setTimeout(() => {
+        window.authManager.init();
+    }, 100);
 }
+
+// Log de carga exitosa
+console.log('✅ AuthManager cargado correctamente - Versión mejorada');

@@ -1,172 +1,115 @@
-console.log('Script.js cargado correctamente');
-
-// Estado global simple
-let cart = [];
-
-// Función simple para verificar autenticación
-function isUserLoggedIn() {
-    try {
-        if (window.authManager && window.authManager.isAuthenticated) {
-            return window.authManager.isAuthenticated();
-        }
-        return false;
-    } catch (error) {
-        console.log('No se pudo verificar autenticación:', error);
-        return false;
-    }
-}
-
-// Función para agregar al carrito
-function addToCart(productId, name, price, image) {
-    if (!isUserLoggedIn()) {
-        alert('Por favor, inicia sesión para agregar productos al carrito');
-        return;
-    }
-
-    // Buscar si ya existe
-    const existing = cart.find(item => item.id === productId);
-    
-    if (existing) {
-        existing.quantity += 1;
-    } else {
-        cart.push({
-            id: productId,
-            name: name,
-            price: price,
-            image: image,
-            quantity: 1
-        });
-    }
-
-    updateCartCount();
-    showSimpleNotification('Producto agregado al carrito');
-}
-
-// Actualizar contador del carrito
-function updateCartCount() {
-    const badge = document.getElementById('cart-badge');
-    if (badge) {
-        const total = cart.reduce((sum, item) => sum + item.quantity, 0);
-        badge.textContent = total;
-    }
-}
-
-// Notificación simple
-function showSimpleNotification(message) {
-    // Crear notificación simple
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #4CAF50;
-        color: white;
-        padding: 15px;
-        border-radius: 5px;
-        z-index: 9999;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    `;
-    notification.textContent = message;
-    
-    document.body.appendChild(notification);
-    
-    // Remover después de 3 segundos
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.remove();
-        }
-    }, 3000);
-}
-
-// Funciones de modal simples
-function showLoginModal() {
-    const modal = document.getElementById('loginModal');
-    if (modal) {
-        modal.style.display = 'block';
-    }
-}
-
-function showRegisterModal() {
-    const modal = document.getElementById('registerModal');
-    if (modal) {
-        modal.style.display = 'block';
-    }
-}
-
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
-
-// Inicialización cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM listo, inicializando funciones básicas...');
-    
-    // Agregar eventos a botones de carrito
-    const cartButtons = document.querySelectorAll('.btn[onclick*="carrito"], .add-to-cart, button[data-action="add-cart"]');
-    cartButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
+<!-- Header -->
+<header class="w-100" style="background: var(--background-color); color: #151515; padding: 0.7rem 0;">
+    <div class="container-fluid">
+        <div class="row align-items-center g-0">
+            <!-- Soporte al cliente -->
+            <div class="col-2 d-flex align-items-center justify-content-center">
+                <i class="fa-solid fa-headset me-1"></i>
+                <div class="d-flex flex-column ms-1">
+                    <span style="font-size:1.85rem;">Soporte</span>
+                    <span style="font-size:1.25rem;font-weight:bold;">3225769546</span>
+                </div>
+            </div>
             
-            // Datos del producto (simplificado)
-            const card = this.closest('.card, .card-product');
-            if (card) {
-                const id = 'prod_' + Math.random().toString(36).substr(2, 9);
-                const name = card.querySelector('h5, h6, .card-title')?.textContent || 'Producto';
-                const price = card.querySelector('.fw-bold, .price')?.textContent || '$0';
-                const img = card.querySelector('img')?.src || '';
-                
-                addToCart(id, name, price, img);
-            }
-        });
-    });
-    
-    // Eventos para cerrar modales
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('close')) {
-            const modal = e.target.closest('.modal');
-            if (modal) modal.style.display = 'none';
-        }
-        
-        if (e.target.classList.contains('modal')) {
-            e.target.style.display = 'none';
-        }
-    });
-    
-    // Menú móvil básico
-    const menuBtn = document.querySelector('.menu-btn, .mobile-menu-btn');
-    const mobileMenu = document.querySelector('.mobile-menu');
-    const overlay = document.querySelector('.mobile-overlay, .mobile-menu-overlay');
-    const closeBtn = document.querySelector('.close-btn, .mobile-menu-close');
-    
-    if (menuBtn && mobileMenu) {
-        menuBtn.addEventListener('click', () => {
-            mobileMenu.classList.add('active');
-            if (overlay) overlay.style.display = 'block';
-        });
-    }
-    
-    if (closeBtn && mobileMenu) {
-        closeBtn.addEventListener('click', () => {
-            mobileMenu.classList.remove('active');
-            if (overlay) overlay.style.display = 'none';
-        });
-    }
-    
-    if (overlay && mobileMenu) {
-        overlay.addEventListener('click', () => {
-            mobileMenu.classList.remove('active');
-            overlay.style.display = 'none';
-        });
-    }
-    
-    console.log('Funciones básicas inicializadas');
-});
+            <!-- Logo -->
+            <div class="col-2 d-flex align-items-center justify-content-end">
+                <a href="../../index.html">
+                    <img src="../../../frontend/assets/img/imagen/mejora.png" alt="Logo" style="height: 50px;" class="me-2">
+                </a>
+            </div>
+            
+            <!-- Nombre de la empresa -->
+            <div class="col-4 d-flex align-items-center justify-content-start">
+                <h1 class="display-8 fw-bold text-uppercase nombre-header" style="margin-bottom:0;color:#0a16c5">
+                    Distribuidora de Dulces La Victoria
+                </h1>
+            </div>
+            
+            <!-- Menú de usuario y carrito -->
+            <div class="col-4 d-flex align-items-center justify-content-end gap-4">
+                <!-- Carrito de compras -->
+                <div class="position-relative">
+                    <a href="#" class="btn btn-outline-secondary d-flex align-items-center gap-2 cart-icon">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="d-none d-md-inline">Carrito</span>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                              style="font-size: 0.6rem; padding: 0.25em 0.5em;" id="cart-badge">0</span>
+                    </a>
+                </div>
 
-// Hacer funciones disponibles globalmente
-window.addToCart = addToCart;
-window.showLoginModal = showLoginModal;
-window.showRegisterModal = showRegisterModal;
-window.closeModal = closeModal;
+                <!-- Menú de usuario -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2" 
+                            type="button" id="userDropdown" data-bs-toggle="dropdown" 
+                            aria-expanded="false" 
+                            style="border: 1px solid #ddd; border-radius: 20px; padding: 6px 12px; background: white;">
+                        <i class="fa-regular fa-circle-user fs-5"></i>
+                        <span class="d-none d-md-inline" id="userName">Cuenta</span>
+                        <span class="d-none" id="userDisplayName"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" 
+                        aria-labelledby="userDropdown" 
+                        id="userDropdownMenu"
+                        style="border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; min-width: 220px;">
+                        
+                        <!-- Encabezado del menú cuando el usuario está autenticado -->
+                        <li id="userInfoHeader" class="dropdown-header d-none">
+                            <div class="d-flex flex-column px-3 py-2">
+                                <span class="fw-bold" id="menuUserName">Usuario</span>
+                                <small class="text-muted" id="menuUserEmail">usuario@ejemplo.com</small>
+                            </div>
+                        </li>
+                        <li id="userMenuDivider" class="dropdown-divider d-none"></li>
+                        
+                        <!-- Opciones para usuarios no autenticados -->
+                        <li id="loginMenuItem">
+                            <a class="dropdown-item d-flex align-items-center py-2" href="javascript:void(0);" onclick="navigateTo('/frontend/views/login.html')">
+                                <i class="fas fa-sign-in-alt me-2" style="width: 20px; text-align: center;"></i>
+                                <span>Iniciar sesión</span>
+                            </a>
+                        </li>
+                        <li id="registerMenuItem">
+                            <a class="dropdown-item d-flex align-items-center py-2" href="javascript:void(0);" onclick="navigateTo('/frontend/views/registro.html')">
+                                <i class="fas fa-user-plus me-2" style="width: 20px; text-align: center;"></i>
+                                <span>Crear cuenta</span>
+                            </a>
+                        </li>
+                        
+                        <!-- Opciones para usuarios autenticados -->
+                        <li id="profileMenuItem" class="d-none">
+                            <a class="dropdown-item d-flex align-items-center py-2" href="javascript:void(0);" onclick="navigateTo('/frontend/views/perfil.html')">
+                                <i class="fas fa-user me-2" style="width: 20px; text-align: center;"></i>
+                                <span>Mi perfil</span>
+                            </a>
+                        </li>
+                        <li id="ordersMenuItem" class="d-none">
+                            <a class="dropdown-item d-flex align-items-center py-2" href="javascript:void(0);" onclick="navigateTo('/frontend/views/mis-pedidos.html')">
+                                <i class="fas fa-shopping-bag me-2" style="width: 20px; text-align: center;"></i>
+                                <span>Mis pedidos</span>
+                            </a>
+                        </li>
+                        
+                        <!-- Opciones de administrador -->
+                        <li id="adminMenuItem" class="d-none">
+                            <a class="dropdown-item d-flex align-items-center py-2" href="javascript:void(0);" onclick="navigateTo('/admin')">
+                                <i class="fas fa-cog me-2" style="width: 20px; text-align: center;"></i>
+                                <span>Panel de administración</span>
+                            </a>
+                        </li>
+                        
+                        <!-- Separador antes de cerrar sesión -->
+                        <li id="logoutDivider" class="dropdown-divider d-none"></li>
+                        
+                        <!-- Cerrar sesión -->
+                        <li id="logoutMenuItem" class="d-none">
+                            <a class="dropdown-item d-flex align-items-center py-2 text-danger" href="javascript:void(0);" onclick="cerrarSesion()">
+                                <i class="fas fa-sign-out-alt me-2" style="width: 20px; text-align: center;"></i>
+                                <span>Cerrar sesión</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
