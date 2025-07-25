@@ -32,6 +32,64 @@
             flex: 1;
             padding: 2rem 0;
         }
+        
+        /* Estilos para loading */
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #28a745;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Efectos hover para productos */
+        .card:hover {
+            transform: translateY(-5px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+        }
+        
+        .product-actions {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .card:hover .product-actions {
+            opacity: 1;
+        }
+        
+        /* Indicador de stock agotado */
+        .out-of-stock::after {
+            content: 'AGOTADO';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            z-index: 10;
+        }
+        
+        .out-of-stock img {
+            opacity: 0.5;
+        }
     </style>
 </head>
 <body class="index-page">
@@ -46,349 +104,22 @@
 
     <main class="bg-light py-5">
         <div class="container">
-            <h2 class="text-center mb-5 display-5 fw-bold text-uppercase">Nuestra Dulcería</h2>
-            <div class="row g-4">
-                <!-- Producto 1 -->
-                <div class="col-12 col-sm-6 col-lg-4 d-flex">
-                    <div class="card h-100 w-100 border-0 shadow-sm overflow-hidden">
-                        <div class="position-relative" style="height: 220px; background-color: #fff8f8;">
-                            <div class="d-flex align-items-center justify-content-center h-100">
-                                <img src="../assets/img/imagen/gomitas-trululu-fresitas-por-90gr.jpg" 
-                                     class="img-fluid p-4" 
-                                     alt="Gomitas Trululu"
-                                     style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                            </div>
-                            <span class="position-absolute top-0 end-0 m-3 bg-danger text-white px-3 py-1 rounded-pill fw-bold small">-13% OFF</span>
-                            <div class="position-absolute bottom-0 start-0 end-0 d-flex justify-content-center gap-2 mb-3">
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-regular fa-eye"></i></button>
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-regular fa-heart"></i></button>
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-solid fa-code-compare"></i></button>
-                            </div>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title fw-bold mb-2 text-center">Gomitas Trululu X 90 gr</h5>
-                            <div class="mb-3 text-center text-warning">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                            </div>
-                            <div class="mt-auto d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="h5 fw-bold text-success mb-0">$2.350</span>
-                                    <small class="d-block text-muted text-decoration-line-through">$2.400</small>
-                                </div>
-                                <button class="btn btn-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-shopping-basket"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Producto 2 -->
-                <div class="col-12 col-sm-6 col-lg-4 d-flex">
-                    <div class="card h-100 w-100 border-0 shadow-sm overflow-hidden">
-                        <div class="position-relative" style="height: 220px; background-color: #fff8f8;">
-                            <div class="d-flex align-items-center justify-content-center h-100">
-                                <img src="../assets/img/imagen/chupeta-bon-bon-bum-surtido-tropical-x-24-und-456-g-1.webp"
-                                     class="img-fluid p-4"
-                                     alt="Bon Bon Bum Tropical"
-                                     style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                            </div>
-                            <span class="position-absolute top-0 end-0 m-3 bg-danger text-white px-3 py-1 rounded-pill fw-bold small">-22% OFF</span>
-                            <div class="position-absolute bottom-0 start-0 end-0 d-flex justify-content-center gap-2 mb-3">
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-regular fa-eye"></i></button>
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-regular fa-heart"></i></button>
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-solid fa-code-compare"></i></button>
-                            </div>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title fw-bold mb-2 text-center">Bon Bon Bum Tropical x 24 UND</h5>
-                            <div class="mb-3 text-center text-warning">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                                <i class="far fa-star"></i>
-                            </div>
-                            <div class="mt-auto d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="h5 fw-bold text-success mb-0">$11.100</span>
-                                    <small class="d-block text-muted text-decoration-line-through">$11.230</small>
-                                </div>
-                                <button class="btn btn-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-shopping-basket"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Producto 3 -->
-                <div class="col-12 col-sm-6 col-lg-4 d-flex">
-                    <div class="card h-100 w-100 border-0 shadow-sm overflow-hidden">
-                        <div class="position-relative" style="height: 220px; background-color: #fff8f8;">
-                            <div class="d-flex align-items-center justify-content-center h-100">
-                                <img src="../assets/img/imagen/barrilete.jpg"
-                                     class="img-fluid p-4"
-                                     alt="Barrilete"
-                                     style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                            </div>
-                            <div class="position-absolute bottom-0 start-0 end-0 d-flex justify-content-center gap-2 mb-3">
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-regular fa-eye"></i></button>
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-regular fa-heart"></i></button>
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-solid fa-code-compare"></i></button>
-                            </div>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title fw-bold mb-2 text-center">Barrilete x 40 UND</h5>
-                            <div class="mb-3 text-center text-warning">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <div class="mt-auto d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="h5 fw-bold text-success mb-0">$10.700</span>
-                                </div>
-                                <button class="btn btn-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-shopping-basket"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Producto 4 -->
-                <div class="col-12 col-sm-6 col-lg-4 d-flex">
-                    <div class="card h-100 w-100 border-0 shadow-sm overflow-hidden">
-                        <div class="position-relative" style="height: 220px; background-color: #fff8f8;">
-                            <div class="d-flex align-items-center justify-content-center h-100">
-                                <img src="../assets/img/imagen/bombon-supercoco-bolsa-x-24-unidades.jpg" 
-                                     class="img-fluid p-4" 
-                                     alt="Super Coco"
-                                     style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                            </div>
-                            <span class="position-absolute top-0 end-0 m-3 bg-danger text-white px-3 py-1 rounded-pill fw-bold small">-13% OFF</span>
-                            <div class="position-absolute bottom-0 start-0 end-0 d-flex justify-content-center gap-2 mb-3">
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-regular fa-eye"></i></button>
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-regular fa-heart"></i></button>
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-solid fa-code-compare"></i></button>
-                            </div>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title fw-bold mb-2 text-center">Supercoco x 24 UND</h5>
-                            <div class="mb-3 text-center text-warning">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                            </div>
-                            <div class="mt-auto d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="h5 fw-bold text-success mb-0">$10.700</span>
-                                    <small class="d-block text-muted text-decoration-line-through">$10.780</small>
-                                </div>
-                                <button class="btn btn-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-shopping-basket"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Producto 5 -->
-                <div class="col-12 col-sm-6 col-lg-4 d-flex">
-                    <div class="card h-100 w-100 border-0 shadow-sm overflow-hidden">
-                        <div class="position-relative" style="height: 220px; background-color: #fff8f8;">
-                            <div class="d-flex align-items-center justify-content-center h-100">
-                                <img src="../assets/img/imagen/1 chicles-xtime-canela (1).jpg"
-                                     class="img-fluid p-4"
-                                     alt="Chicle X-Time Canela"
-                                     style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                            </div>
-                            <span class="position-absolute top-0 end-0 m-3 bg-danger text-white px-3 py-1 rounded-pill fw-bold small">-22% OFF</span>
-                            <div class="position-absolute bottom-0 start-0 end-0 d-flex justify-content-center gap-2 mb-3">
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-regular fa-eye"></i></button>
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-regular fa-heart"></i></button>
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-solid fa-code-compare"></i></button>
-                            </div>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title fw-bold mb-2 text-center">Chicle Canela x 100 UND</h5>
-                            <div class="mb-3 text-center text-warning">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                                <i class="far fa-star"></i>
-                            </div>
-                            <div class="mt-auto d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="h5 fw-bold text-success mb-0">$12.800</span>
-                                    <small class="d-block text-muted text-decoration-line-through">$12.850</small>
-                                </div>
-                                <button class="btn btn-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-shopping-basket"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Producto 6 -->
-                <div class="col-12 col-sm-6 col-lg-4 d-flex">
-                    <div class="card h-100 w-100 border-0 shadow-sm overflow-hidden">
-                        <div class="position-relative" style="height: 220px; background-color: #fff8f8;">
-                            <div class="d-flex align-items-center justify-content-center h-100">
-                                <img src="../assets/img/imagen/cliclets x 100.jpg"
-                                     class="img-fluid p-4"
-                                     alt="Chiclets Menta"
-                                     style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                            </div>
-                            <div class="position-absolute bottom-0 start-0 end-0 d-flex justify-content-center gap-2 mb-3">
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-regular fa-eye"></i></button>
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-regular fa-heart"></i></button>
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-solid fa-code-compare"></i></button>
-                            </div>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title fw-bold mb-2 text-center">Chiclets Menta x 100 UND</h5>
-                            <div class="mb-3 text-center text-warning">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <div class="mt-auto d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="h5 fw-bold text-success mb-0">$19.000</span>
-                                </div>
-                                <button class="btn btn-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-shopping-basket"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Producto 7 -->
-                <div class="col-12 col-sm-6 col-lg-4 d-flex">
-                    <div class="card h-100 w-100 border-0 shadow-sm overflow-hidden">
-                        <div class="position-relative" style="height: 220px; background-color: #fff8f8;">
-                            <div class="d-flex align-items-center justify-content-center h-100">
-                                <img src="../assets/img/imagen/fruna 1.webp" 
-                                     class="img-fluid p-4" 
-                                     alt="Fruna Masticable"
-                                     style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                            </div>
-                            <span class="position-absolute top-0 end-0 m-3 bg-danger text-white px-3 py-1 rounded-pill fw-bold small">-13% OFF</span>
-                            <div class="position-absolute bottom-0 start-0 end-0 d-flex justify-content-center gap-2 mb-3">
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-regular fa-eye"></i></button>
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-regular fa-heart"></i></button>
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-solid fa-code-compare"></i></button>
-                            </div>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title fw-bold mb-2 text-center">Fruna Masticable x 100 UND</h5>
-                            <div class="mb-3 text-center text-warning">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                            </div>
-                            <div class="mt-auto d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="h5 fw-bold text-success mb-0">$11.700</span>
-                                    <small class="d-block text-muted text-decoration-line-through">$11.820</small>
-                                </div>
-                                <button class="btn btn-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-shopping-basket"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Producto 8 -->
-                <div class="col-12 col-sm-6 col-lg-4 d-flex">
-                    <div class="card h-100 w-100 border-0 shadow-sm overflow-hidden">
-                        <div class="position-relative" style="height: 220px; background-color: #fff8f8;">
-                            <div class="d-flex align-items-center justify-content-center h-100">
-                                <img src="../assets/img/imagen/frutas-Mix.jpg"
-                                     class="img-fluid p-4"
-                                     alt="Frutas Mix"
-                                     style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                            </div>
-                            <span class="position-absolute top-0 end-0 m-3 bg-danger text-white px-3 py-1 rounded-pill fw-bold small">-22% OFF</span>
-                            <div class="position-absolute bottom-0 start-0 end-0 d-flex justify-content-center gap-2 mb-3">
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-regular fa-eye"></i></button>
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-regular fa-heart"></i></button>
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-solid fa-code-compare"></i></button>
-                            </div>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title fw-bold mb-2 text-center">Frutas Mix x 100 UND</h5>
-                            <div class="mb-3 text-center text-warning">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                                <i class="far fa-star"></i>
-                            </div>
-                            <div class="mt-auto d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="h5 fw-bold text-success mb-0">$6.700</span>
-                                    <small class="d-block text-muted text-decoration-line-through">$6.840</small>
-                                </div>
-                                <button class="btn btn-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-shopping-basket"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Producto 9 -->
-                <div class="col-12 col-sm-6 col-lg-4 d-flex">
-                    <div class="card h-100 w-100 border-0 shadow-sm overflow-hidden">
-                        <div class="position-relative" style="height: 220px; background-color: #fff8f8;">
-                            <div class="d-flex align-items-center justify-content-center h-100">
-                                <img src="../assets/img/imagen/gelatina-liquida-1.jpg"
-                                     class="img-fluid p-4"
-                                     alt="Gelatina Líquida"
-                                     style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                            </div>
-                            <div class="position-absolute bottom-0 start-0 end-0 d-flex justify-content-center gap-2 mb-3">
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-regular fa-eye"></i></button>
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-regular fa-heart"></i></button>
-                                <button class="btn btn-light rounded-circle p-2"><i class="fa-solid fa-code-compare"></i></button>
-                            </div>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title fw-bold mb-2 text-center">Gelatina Líquida x 20 UND</h5>
-                            <div class="mb-3 text-center text-warning">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <div class="mt-auto d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="h5 fw-bold text-success mb-0">$12.300</span>
-                                </div>
-                                <button class="btn btn-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-shopping-basket"></i>
-                                </button>
-                            </div>
+            <h2 class="text-center mb-5 display-5 fw-bold text-uppercase">🍭 Nuestra Dulcería Premium</h2>
+            
+            <!-- Debug Info (se ocultará automáticamente) -->
+            <div id="debug-info" class="alert alert-info d-none">
+                <strong>Debug Info:</strong>
+                <div id="debug-content"></div>
+            </div>
+            
+            <!-- Contenedor dinámico de productos -->
+            <div class="row g-4" id="productos-container">
+                <!-- Loading inicial -->
+                <div class="col-12">
+                    <div class="loading-container">
+                        <div class="text-center">
+                            <div class="loading-spinner mb-3"></div>
+                            <p class="text-muted">Cargando deliciosos dulces...</p>
                         </div>
                     </div>
                 </div>
@@ -460,14 +191,425 @@
     <script src="../assets/js/auth_manager.js"></script>
     <script src="../assets/js/script.js"></script>
 
-    <!-- SCRIPT DE INICIALIZACIÓN ESTÁNDAR -->
+    <!-- SCRIPT DINÁMICO DE PRODUCTOS - VERSIÓN ROBUSTA -->
     <script>
-        // Configuración de rutas base
+        // ===== VARIABLES GLOBALES =====
+        let productos = [];
+        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        let debugMode = window.location.search.includes('debug=true');
+
+        // ===== CONFIGURACIÓN DINÁMICA =====
+        let CONFIG = {
+            categoria: 'dulceria',
+            columnaCategoria: 'categorias',
+            columnaStock: 'existencia',
+            columnaImagen: 'URL_de_imagen',
+            columnaActivo: 'activo'
+        };
+
+        // ===== FUNCIÓN DE DEBUG =====
+        function debug(mensaje, datos = null) {
+            console.log(`🍭 [DULCERÍA] ${mensaje}`, datos || '');
+            
+            if (debugMode) {
+                const debugInfo = document.getElementById('debug-info');
+                const debugContent = document.getElementById('debug-content');
+                if (debugInfo && debugContent) {
+                    debugInfo.classList.remove('d-none');
+                    debugContent.innerHTML += `<br>• ${mensaje}`;
+                    if (datos) debugContent.innerHTML += `: ${JSON.stringify(datos)}`;
+                }
+            }
+        }
+
+        // ===== FUNCIÓN PARA DETECTAR CONFIGURACIÓN =====
+        async function detectarConfiguracion() {
+            try {
+                debug('Detectando configuración de base de datos...');
+                
+                // Obtener un producto de muestra para detectar columnas
+                const { data: muestra, error } = await supabase
+                    .from('productos')
+                    .select('*')
+                    .limit(1);
+                    
+                if (error) throw error;
+                
+                if (muestra && muestra.length > 0) {
+                    const columnas = Object.keys(muestra[0]);
+                    debug('Columnas detectadas', columnas);
+                    
+                    // Detectar columna de categoría
+                    const posiblesCategoria = ['categorias', 'categoria', 'category', 'tipo'];
+                    for (const col of posiblesCategoria) {
+                        if (columnas.includes(col)) {
+                            CONFIG.columnaCategoria = col;
+                            break;
+                        }
+                    }
+                    
+                    // Detectar columna de stock
+                    const posiblesStock = ['existencia', 'stock', 'cantidad', 'inventory'];
+                    for (const col of posiblesStock) {
+                        if (columnas.includes(col)) {
+                            CONFIG.columnaStock = col;
+                            break;
+                        }
+                    }
+                    
+                    // Detectar columna de imagen
+                    const posiblesImagen = ['URL_de_imagen', 'imagen_url', 'image_url', 'foto', 'imagen'];
+                    for (const col of posiblesImagen) {
+                        if (columnas.includes(col)) {
+                            CONFIG.columnaImagen = col;
+                            break;
+                        }
+                    }
+                    
+                    // Detectar columna activo
+                    const posiblesActivo = ['activo', 'active', 'enabled', 'visible'];
+                    for (const col of posiblesActivo) {
+                        if (columnas.includes(col)) {
+                            CONFIG.columnaActivo = col;
+                            break;
+                        }
+                    }
+                    
+                    debug('Configuración detectada', CONFIG);
+                }
+                
+                return true;
+            } catch (error) {
+                debug('Error detectando configuración', error.message);
+                return false;
+            }
+        }
+
+        // ===== FUNCIÓN PRINCIPAL PARA CARGAR PRODUCTOS =====
+        async function cargarProductos() {
+            try {
+                debug('Iniciando carga de productos de dulcería...');
+                
+                // Detectar configuración primero
+                await detectarConfiguracion();
+                
+                // Estrategia 1: Intentar consulta completa
+                let productosData = null;
+                let error = null;
+                
+                try {
+                    debug(`Intentando consulta con filtros: ${CONFIG.columnaCategoria}=${CONFIG.categoria}`);
+                    
+                    let query = supabase.from('productos').select('*');
+                    
+                    // Filtrar por categoría
+                    query = query.eq(CONFIG.columnaCategoria, CONFIG.categoria);
+                    
+                    // Solo agregar filtro activo si la columna existe
+                    if (CONFIG.columnaActivo) {
+                        query = query.eq(CONFIG.columnaActivo, true);
+                    }
+                    
+                    const result = await query.order('nombre', { ascending: true });
+                    productosData = result.data;
+                    error = result.error;
+                    
+                } catch (e) {
+                    error = e;
+                    debug('Error en consulta con filtros', e.message);
+                }
+                
+                // Estrategia 2: Si falla, intentar sin filtro activo
+                if (error || !productosData || productosData.length === 0) {
+                    try {
+                        debug('Intentando consulta sin filtro activo...');
+                        
+                        const result = await supabase
+                            .from('productos')
+                            .select('*')
+                            .eq(CONFIG.columnaCategoria, CONFIG.categoria)
+                            .order('nombre', { ascending: true });
+                            
+                        productosData = result.data;
+                        error = result.error;
+                        
+                    } catch (e) {
+                        error = e;
+                        debug('Error en consulta sin filtro activo', e.message);
+                    }
+                }
+                
+                // Estrategia 3: Si aún falla, obtener todos y filtrar manualmente
+                if (error || !productosData || productosData.length === 0) {
+                    try {
+                        debug('Intentando obtener todos los productos y filtrar manualmente...');
+                        
+                        const result = await supabase
+                            .from('productos')
+                            .select('*')
+                            .order('nombre', { ascending: true });
+                            
+                        if (result.error) throw result.error;
+                        
+                        // Filtrar manualmente por categoría
+                        productosData = result.data.filter(producto => {
+                            const categoria = producto[CONFIG.columnaCategoria];
+                            return categoria && categoria.toLowerCase().includes('dulc');
+                        });
+                        
+                        debug(`Productos filtrados manualmente: ${productosData.length}`);
+                        
+                    } catch (e) {
+                        throw new Error(`Error obteniendo productos: ${e.message}`);
+                    }
+                }
+                
+                if (error) {
+                    throw error;
+                }
+                
+                productos = productosData || [];
+                debug(`Productos cargados exitosamente: ${productos.length}`);
+                
+                mostrarProductos(productos);
+                
+            } catch (error) {
+                debug('Error cargando productos', error.message);
+                console.error('❌ Error cargando productos:', error);
+                mostrarError('Error al cargar productos. Por favor, recarga la página.');
+            }
+        }
+
+        // ===== FUNCIÓN PARA MOSTRAR PRODUCTOS =====
+        function mostrarProductos(productos) {
+            const container = document.getElementById('productos-container');
+            
+            debug(`Mostrando ${productos.length} productos`);
+            
+            if (productos.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12 text-center">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No hay productos de dulcería disponibles en este momento.
+                            <button class="btn btn-outline-warning btn-sm ms-3" onclick="cargarProductos()">
+                                <i class="fas fa-sync-alt me-1"></i>Reintentar
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            
+            productos.forEach(producto => {
+                // Obtener valores usando la configuración detectada
+                const precio = producto.precio || 0;
+                const stock = producto[CONFIG.columnaStock] || 0;
+                const imagen = producto[CONFIG.columnaImagen] || '../assets/img/imagen/placeholder.jpg';
+                const nombre = producto.nombre || 'Producto sin nombre';
+                const descripcion = producto.descripcion || 'Deliciosos dulces premium';
+                
+                // Calcular descuento aleatorio
+                const tieneDescuento = Math.random() > 0.4;
+                const porcentajeDescuento = Math.floor(Math.random() * 20) + 5;
+                const precioOriginal = tieneDescuento ? Math.round(precio * 1.1) : null;
+                
+                // Verificar stock
+                const sinStock = stock <= 0;
+                const stockBajo = stock > 0 && stock <= 10;
+                
+                html += `
+                    <div class="col-12 col-sm-6 col-lg-4 d-flex">
+                        <div class="card h-100 w-100 border-0 shadow-sm overflow-hidden">
+                            <div class="position-relative" style="height: 220px; background-color: #fff8f8;">
+                                <div class="d-flex align-items-center justify-content-center h-100 ${sinStock ? 'out-of-stock' : ''}">
+                                    <img src="${imagen}" 
+                                         class="img-fluid p-4" 
+                                         alt="${nombre}"
+                                         style="max-height: 100%; max-width: 100%; object-fit: contain;"
+                                         onerror="this.src='../assets/img/imagen/placeholder.jpg'">
+                                </div>
+                                
+                                ${tieneDescuento && !sinStock ? 
+                                    `<span class="position-absolute top-0 end-0 m-3 bg-danger text-white px-3 py-1 rounded-pill fw-bold small">-${porcentajeDescuento}% OFF</span>` : 
+                                    ''
+                                }
+                                
+                                ${stockBajo && !sinStock ? 
+                                    `<span class="position-absolute top-0 start-0 m-3 bg-warning text-dark px-2 py-1 rounded-pill fw-bold small">¡Últimas ${stock}!</span>` : 
+                                    ''
+                                }
+                                
+                                <div class="position-absolute bottom-0 start-0 end-0 d-flex justify-content-center gap-2 mb-3 product-actions">
+                                    <button class="btn btn-light rounded-circle p-2" onclick="verDetalles(${producto.id})" title="Ver detalles">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-light rounded-circle p-2" onclick="toggleFavorito(${producto.id})" title="Agregar a favoritos">
+                                        <i class="fa-regular fa-heart"></i>
+                                    </button>
+                                    <button class="btn btn-light rounded-circle p-2" onclick="compartirProducto(${producto.id})" title="Compartir">
+                                        <i class="fa-solid fa-share"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-bold mb-2 text-center">${nombre}</h5>
+                                <div class="mb-3 text-center text-warning">
+                                    ${generarEstrellas()}
+                                </div>
+                                <div class="mt-auto d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="h5 fw-bold text-success mb-0">$${precio.toLocaleString()}</span>
+                                        ${precioOriginal ? 
+                                            `<small class="d-block text-muted text-decoration-line-through">$${precioOriginal.toLocaleString()}</small>` : 
+                                            ''
+                                        }
+                                    </div>
+                                    <button class="btn btn-success rounded-circle d-flex align-items-center justify-content-center" 
+                                            style="width: 40px; height: 40px;"
+                                            onclick="agregarAlCarrito(${producto.id})"
+                                            ${sinStock ? 'disabled' : ''}
+                                            title="${sinStock ? 'Producto agotado' : 'Agregar al carrito'}">
+                                        <i class="fas fa-shopping-basket"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // ===== FUNCIONES AUXILIARES =====
+        function generarEstrellas() {
+            const rating = Math.floor(Math.random() * 2) + 3;
+            const tieneMedia = Math.random() > 0.5;
+            let estrellas = '';
+            
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    estrellas += '<i class="fas fa-star"></i>';
+                } else if (i === rating + 1 && tieneMedia) {
+                    estrellas += '<i class="fas fa-star-half-alt"></i>';
+                } else {
+                    estrellas += '<i class="far fa-star"></i>';
+                }
+            }
+            return estrellas;
+        }
+
+        function mostrarError(mensaje) {
+            const container = document.getElementById('productos-container');
+            container.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-danger text-center">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        ${mensaje}
+                        <br><br>
+                        <button class="btn btn-outline-danger btn-sm me-2" onclick="cargarProductos()">
+                            <i class="fas fa-sync-alt me-1"></i>Reintentar
+                        </button>
+                        <button class="btn btn-outline-info btn-sm" onclick="window.location.href += '?debug=true'; window.location.reload();">
+                            <i class="fas fa-bug me-1"></i>Modo Debug
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ===== FUNCIONES DE INTERACCIÓN =====
+        function verDetalles(productId) {
+            const producto = productos.find(p => p.id === productId);
+            if (producto) {
+                const stock = producto[CONFIG.columnaStock] || 0;
+                alert(`Detalles de: ${producto.nombre}\n\n${producto.descripcion || 'Deliciosos dulces premium'}\n\nPrecio: $${producto.precio.toLocaleString()}\nStock disponible: ${stock} unidades`);
+            }
+        }
+
+        function toggleFavorito(productId) {
+            const producto = productos.find(p => p.id === productId);
+            if (producto) {
+                mostrarNotificacion(`${producto.nombre} agregado a favoritos`, 'success');
+            }
+        }
+
+        function compartirProducto(productId) {
+            const producto = productos.find(p => p.id === productId);
+            if (producto) {
+                if (navigator.share) {
+                    navigator.share({
+                        title: producto.nombre,
+                        text: `¡Mira este delicioso dulce! ${producto.descripcion || ''}`,
+                        url: window.location.href
+                    });
+                } else {
+                    const url = `${window.location.href}?producto=${productId}`;
+                    navigator.clipboard.writeText(url).then(() => {
+                        mostrarNotificacion('Enlace copiado al portapapeles', 'info');
+                    });
+                }
+            }
+        }
+
+        function agregarAlCarrito(productId) {
+            const producto = productos.find(p => p.id === productId);
+            if (producto) {
+                const stock = producto[CONFIG.columnaStock] || 0;
+                if (stock > 0) {
+                    const itemExistente = carrito.find(item => item.id === productId);
+                    
+                    if (itemExistente) {
+                        itemExistente.cantidad += 1;
+                    } else {
+                        carrito.push({
+                            id: producto.id,
+                            nombre: producto.nombre,
+                            precio: producto.precio,
+                            imagen_url: producto[CONFIG.columnaImagen],
+                            cantidad: 1
+                        });
+                    }
+                    
+                    localStorage.setItem('carrito', JSON.stringify(carrito));
+                    actualizarContadorCarrito();
+                    mostrarNotificacion(`${producto.nombre} agregado al carrito`, 'success');
+                }
+            }
+        }
+
+        function actualizarContadorCarrito() {
+            const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
+            const badge = document.getElementById('cart-badge');
+            if (badge) {
+                badge.textContent = totalItems;
+            }
+        }
+
+        function mostrarNotificacion(mensaje, tipo = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${tipo} position-fixed`;
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notification.innerHTML = `
+                <i class="fas fa-${tipo === 'success' ? 'check' : tipo === 'error' ? 'exclamation-triangle' : 'info'}-circle me-2"></i>
+                ${mensaje}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // ===== FUNCIONES DE CONFIGURACIÓN =====
         function navigateTo(path) {
             window.location.href = path;
         }
         
-        // Función para cargar componentes
         const loadComponent = (elementId, path) => {
             return fetch(path)
                 .then(response => response.text())
@@ -481,9 +623,9 @@
                 });
         };
 
-        // INICIALIZACIÓN ESTÁNDAR PARA TODAS LAS PÁGINAS
+        // ===== INICIALIZACIÓN =====
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🚀 Inicializando página dulcería...');
+            debug('Inicializando página dinámica de dulcería...');
             
             try {
                 // 1. Cargar componentes primero
@@ -492,17 +634,23 @@
                     loadComponent('navbar-container', './components/navbar.html')
                 ]);
                 
-                console.log('✅ Componentes cargados');
+                debug('Componentes cargados');
                 
                 // 2. Esperar un poco para que los elementos se rendericen
                 setTimeout(async () => {
                     // 3. Inicializar AuthManager
                     if (window.authManager && !window.authManager.initialized) {
                         await window.authManager.init();
-                        console.log('✅ AuthManager inicializado');
+                        debug('AuthManager inicializado');
                     }
                     
-                    // 4. Marcar enlace activo en navbar
+                    // 4. Cargar productos dinámicamente
+                    await cargarProductos();
+                    
+                    // 5. Actualizar contador del carrito
+                    actualizarContadorCarrito();
+                    
+                    // 6. Marcar enlace activo en navbar
                     document.querySelectorAll('.nav-link').forEach(link => {
                         const href = link.getAttribute('onclick');
                         if (href && href.includes('dulceria.html')) {
@@ -516,19 +664,19 @@
                         }
                     });
                     
-                    // 5. Inicializar tooltips de Bootstrap
-                    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                    tooltipTriggerList.map(function (tooltipTriggerEl) {
-                        return new bootstrap.Tooltip(tooltipTriggerEl);
-                    });
-                    
-                    console.log('🎉 Página dulcería completamente inicializada');
+                    debug('Página completamente inicializada');
                 }, 100);
                 
             } catch (error) {
+                debug('Error al inicializar la página', error.message);
                 console.error('❌ Error al inicializar la página:', error);
+                mostrarError('Error al inicializar la página');
             }
         });
+
+        // Exponer funciones para debugging
+        window.cargarProductosDulceria = cargarProductos;
+        window.debugDulceria = () => { debugMode = true; cargarProductos(); };
     </script>
 </body>
 </html>
